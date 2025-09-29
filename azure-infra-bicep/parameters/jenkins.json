@@ -14,8 +14,8 @@
         "imageReference": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "22_04-lts",
-          "version": "22.04.20250401"
+          "sku": "18.10",
+          "version": "latest"
         },
         "osDiskType": "Premium_LRS",
         "osDiskSizeGB": 64

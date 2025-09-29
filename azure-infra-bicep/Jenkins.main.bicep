@@ -1,4 +1,4 @@
-// //// Virtual Machine//
+// //// Main Virtual Machine//
 targetScope = 'resourceGroup'
 @description('Tag suffix for resource tagging')
 param tagSuffix string
