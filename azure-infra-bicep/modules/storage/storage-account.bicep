@@ -16,10 +16,18 @@ var factoryResourceIds = [
 ]
 
 // ==========================
+// Generate valid storage account name
+// ==========================
+var maxBaseLength = 24 - 13 // 24 max - 13 from uniqueString
+
+var baseName = toLower(substring(storageConfig.storageAccountName, 0, maxBaseLength))
+var storageAccountNameUnique = '${baseName}${uniqueString(resourceGroup().id)}' // total ≤24 chars
+
+// ==========================
 // Storage Account
 // ==========================
 resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
-  name: '${storageConfig.storageAccountName}${uniqueString(resourceGroup().id)}' // ensures unique name
+  name: storageAccountNameUnique
   location: storageConfig.location
   sku: { name: storageConfig.sku.name }
   kind: storageConfig.kind
