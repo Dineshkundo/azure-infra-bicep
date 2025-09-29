@@ -1,3 +1,6 @@
+// //// Storage Account Module
+targetScope = 'resourceGroup'
+@description('Tag suffix for resource tagging')
 param storageConfig object
 param tagSuffix string
 

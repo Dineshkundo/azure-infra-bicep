@@ -72,25 +72,6 @@ param vmConfig object
 // output subnetIds array = vnet.outputs.subnetIds
 
 
-// //// Virtual Machine//
-
-
-@secure()
-param secrets object
-
-module vm './modules/virtual-machine/Jenkins-Build-Server.bicep' = {
-  name: 'deployVM'
-  params: {
-    vmConfig: vmConfig
-    secrets: secrets
-    tagSuffix: tagSuffix
-
-  }
-}
-
-output vmId string = vm.outputs.vmId
-output vmName string = vm.outputs.vmName
-output nicId string = vm.outputs.nicId
 
 
 // ///////////////////////////////////////////////////////////
