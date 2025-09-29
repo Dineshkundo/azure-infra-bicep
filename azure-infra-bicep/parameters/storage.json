@@ -5,7 +5,7 @@
     "storageConfig": {
       "value": {
         "storageAccountName": "devstorageacct01",
-        "location": "eastus",
+        "location": "[parameters('location')]",
         "sku": {
           "name": "Standard_LRS",
           "tier": "Standard"
@@ -13,45 +13,23 @@
         "kind": "StorageV2",
         "accessTier": "Hot",
         "tags": {
-          "env": "dev",
+          "env": "[parameters('env')]",
           "project": "aftra"
         },
-        "accessKeySecretName": "dev-storage-key",
-        "allowedIpAddresses": [
-          "10.0.0.1",
-          "10.0.0.2"
-        ],
-        "factoryResourceIds": [
-          "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.DataFactory/factories/dev-adf01"
-        ],
-        "subnetIds": [
-          "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/dev-subnet1",
-          "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/dev-subnet2"
-        ],
+        "accessKeySecretName": "[parameters('accessKeySecretName')]",
+        "allowedIpAddresses": [],
+        "factoryResourceIds": [],
+        "subnetIds": [],
         "blobContainers": [
           "akslogs",
           "codadev",
           "codadocumentuploads",
           "codafileattachments",
-          "codaqa",
-          "codaregistry-images",
-          "codastoragedev",
-          "codastorageuat",
-          "codauat",
-          "copyactivity-logs",
-          "devbacpac",
-          "elasticsearch-backups-dev",
-          "insights-logs-networksecuritygroupflowevent",
-          "jenkins-backup",
-          "jenkinsserver-config-backup",
-          "sql-backup",
-          "test"
+          "codaqa"
         ],
         "fileShares": [
           "downloaded-claims",
-          "oc-payment-files",
-          "ssdtexecution",
-          "test-file-share"
+          "oc-payment-files"
         ]
       }
     }

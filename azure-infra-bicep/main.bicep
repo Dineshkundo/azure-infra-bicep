@@ -33,6 +33,7 @@ param keyVaultConfig object
 param vmConfig object
 param storageConfig object
 param vnetConfig object
+
 // Name of the existing key vault (all VMs use the same KV for secrets)
 @description('Name of Key Vault that already contains the secrets')
 param keyVaultName string
