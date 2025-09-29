@@ -1,32 +1,22 @@
-// //#####################################################################################################
-// iac/
-// ├── main.bicep                     # Orchestration file calling all modules
-// ├── output.bicep                   # Optional, central outputs
-// ├── modules/                       # All reusable modules
-// │   ├── keyvault.bicep             # Key Vault module
-// │   ├── virtual-machine.bicep      # VM module
-// │   ├── network.bicep              # VNet + subnets module
-// │   ├── storage.bicep              # Storage account + containers/shares
-// │   ├── aks.bicep                  # AKS cluster module
-// │   └── others/                    # Any other resource modules
-// ├── variables/                     # Environment-specific parameter files
-// │   ├── dev.parameters.json
-// │   ├── uat.parameters.json
-// │   ├── prod.parameters.json
-// │   ├── dev.vm.variables.json      # Optional: separate VM variables if many VMs
-// │   └── ...
-// ├── scripts/                       # Any scripts used by Jenkins / pre/post deployments
-// │   └── create-keyvault-secrets.sh
-// ├── output/                        # Optional: store outputs
-// │   ├── dev.output.json
-// │   ├── uat.output.json
-// │   └── prod.output.json
-// └── Jenkinsfile                    # CI/CD pipeline
-//#####################################################################################################
-
-
+// #####################################################################################################
+// main.bicep - Modular Infrastructure
+// #####################################################################################################
 
 targetScope = 'resourceGroup'
+
+// ==========================
+// Deployment Flags (for selective deployments)
+// ==========================
+param deployKeyVault bool = true
+param deployNetworking bool = true
+param deployStorage bool = true
+param deployVMs bool = true
+param deployAKS bool = true
+param deploySQL bool = true
+
+// ==========================
+// Core Parameters
+// ==========================
 param location string = resourceGroup().location
 
 param keyVaultConfig object
@@ -34,25 +24,11 @@ param vmConfig object
 param storageConfig object
 param vnetConfig object
 
-// Name of the existing key vault (all VMs use the same KV for secrets)
-@description('Name of Key Vault that already contains the secrets')
+@description('Name of the existing Key Vault')
 param keyVaultName string
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyVaultName
-}
-
-module kv './modules/security/keyvault.bicep' = {
-  name: 'deployKeyVault'
-  params: {
-    config: keyVaultConfig
-  }
-}
-output keyVaultId string = kv.outputs.keyVaultId
-output keyVaultName string = kv.outputs.keyVaultName
-output keyVaultUri string = kv.outputs.keyVaultUri
-
-//// Networking Module  
+@secure()
+param secrets object
 
 param nsgPublicSubnetId string
 param nsgPrivateSubnetId string
@@ -60,7 +36,29 @@ param rtFirewallMgmtId string
 param rtAksOnPremId string
 param remoteVnetId string
 
-module vnet './modules/networking/vnet.bicep' = {
+param vms array
+param vmConfigs array
+
+// #####################################################################################################
+// Key Vault
+// #####################################################################################################
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+
+module kv './modules/security/keyvault.bicep' = if (deployKeyVault) {
+  name: 'deployKeyVault'
+  params: { config: keyVaultConfig }
+}
+
+output keyVaultId string = deployKeyVault ? kv.outputs.keyVaultId : ''
+output keyVaultName string = deployKeyVault ? kv.outputs.keyVaultName : ''
+output keyVaultUri string = deployKeyVault ? kv.outputs.keyVaultUri : ''
+
+// #####################################################################################################
+// Networking
+// #####################################################################################################
+module vnet './modules/networking/vnet.bicep' = if (deployNetworking) {
   name: 'deployVNet'
   params: {
     config: union(vnetConfig, {
@@ -73,48 +71,35 @@ module vnet './modules/networking/vnet.bicep' = {
   }
 }
 
-output vnetId string = vnet.outputs.vnetId
-output subnet1Id string = vnet.outputs.subnet1Id
-output subnetIds array = vnet.outputs.subnetIds
+output vnetId string = deployNetworking ? vnet.outputs.vnetId : ''
+output subnet1Id string = deployNetworking ? vnet.outputs.subnet1Id : ''
+output subnetIds array = deployNetworking ? vnet.outputs.subnetIds : []
 
-//// Storage Account Module
-
-
-module storage './modules/storage/storage-account.bicep' = {
+// #####################################################################################################
+// Storage Account
+// #####################################################################################################
+module storage './modules/storage/storage-account.bicep' = if (deployStorage) {
   name: 'storageModule'
-  params: {
-    storageConfig: storageConfig
-  }
+  params: { storageConfig: storageConfig }
 }
 
+output storageAccountId string = deployStorage ? storage.outputs.storageAccountResourceId : ''
+output storagePrincipalId string = deployStorage ? storage.outputs.principalId : ''
+output storageAccountName string = deployStorage ? storage.outputs.storageAccountName : ''
 
-output storageAccountId string = storage.outputs.storageAccountResourceId
-output storagePrincipalId string = storage.outputs.principalId
-output storageAccountName string = storage.outputs.storageAccountName
-
-//// Virtual Machine//
-
-
-@secure()
-param secrets object
-
-module vm './modules/virtual-machine/vm.bicep' = {
+// #####################################################################################################
+// Virtual Machines
+// #####################################################################################################
+module vm './modules/virtual-machine/vm.bicep' = if (deployVMs) {
   name: 'deployVM'
-  params: {
-    vmConfig: vmConfig
-    secrets: secrets
-  }
+  params: { vmConfig: vmConfig, secrets: secrets }
 }
 
-output vmId string = vm.outputs.vmId
-output vmName string = vm.outputs.vmName
-output nicId string = vm.outputs.nicId
+output vmId string = deployVMs ? vm.outputs.vmId : ''
+output vmName string = deployVMs ? vm.outputs.vmName : ''
+output nicId string = deployVMs ? vm.outputs.nicId : ''
 
-
-///////////////////////////////////////////////////////////
-
-// Deploy VMs from configs
-module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bicep' = [for vm in vmConfigs: {
+module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bicep' = if (deployVMs) [for vm in vmConfigs: {
   name: '${vm.name}-deploy'
   params: {
     name: vm.name
@@ -129,7 +114,7 @@ module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bic
     diagnostics: vm.diagnostics
     zone: vm.zone
 
-    // 🔑 Secure params from Key Vault
+    // Key Vault secrets
     adminUsername: keyVault.getSecret(vm.adminUsernameSecret)
     extensionUsername: keyVault.getSecret(vm.extensionSecrets.username)
     extensionPassword: keyVault.getSecret(vm.extensionSecrets.password)
@@ -139,12 +124,9 @@ module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bic
     extensionExpiration: keyVault.getSecret(vm.extensionSecrets.expiration)
   }
 }]
-///////////////////////////////////////////////////////////
-// RHEL Dev/QA VM deployments
-@description('Array of VM configurations')
-param vms array
 
-module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vms: {
+// RHEL Dev/QA VMs
+module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = if (deployVMs) [for vm in vms: {
   name: 'deploy-${vm.vmName}'
   params: {
     vmName: vm.vmName
@@ -167,70 +149,26 @@ module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vms:
   }
 }]
 
-
-///////////////////////////////////////////////////////////
-
-module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = [for vm in vms: {
+// #####################################################################################################
+// Boomi / Matching Service / RedhatServerUAT
+// #####################################################################################################
+module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = if (deployVMs) [for vm in vms: {
   name: 'deploy-${vm.name}'
-  params: {
-    location: location
-    vmConfig: vm
-  }
+  params: { location: location, vmConfig: vm }
 }]
 
-
-///////////////////////////////////////////////////////////
-///// Matching Service VM deployments
-///
-
-module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [for vm in vms: {
+module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = if (deployVMs) [for vm in vms: {
   name: 'deploy-${vm.name}'
-  params: {
-    location: location
-    vmConfig: vm
-  }
+  params: { location: location, vmConfig: vm }
 }]
 
-
-////////////////////////////////////////////////////////////////////
-///// RedhatServerUAT ///
-///          
-@description('Array of VM configurations')
-param vmConfigs array 
-
-module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for vm in vmConfigs: {
+module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = if (deployVMs) [for vm in vmConfigs: {
   name: '${vm.name}-deployment'
-  params: {
-    vmConfig: vm
-    location: location
-  }
+  params: { vmConfig: vm, location: location }
 }]
-//// AKS and SQL Modules
-// module aks './modules/cluster/aks.bicep' = {
-//   name: 'deployAKS'
-//   params: {
-//     clusterName: aksConfig.clusterName
-//     nodeCount: aksConfig.nodeCount
-//     nodeSize: aksConfig.nodeSize
-//     servicePrincipalSecretName: aksConfig.servicePrincipalSecretName
-//     keyVaultName: keyVaultConfig.keyVaultName
-//     location: location
-//   }
-// }
 
-// module sql './modules/data-factory/sql.bicep' = {
-//   name: 'deploySQL'
-//   params: {
-//     sqlServerName: sqlConfig.sqlServerName
-//     databaseName: sqlConfig.databaseName
-//     adminUser: sqlConfig.adminUser
-//     adminPasswordSecretName: sqlConfig.adminPasswordSecretName
-//     keyVaultName: keyVaultConfig.keyVaultName
-//     location: location
-//   }
-// }
-
-
-
-// output aksId string = aks.outputs.aksId
-// output sqlConnection string = sql.outputs.sqlConnectionString
+// #####################################################################################################
+// AKS & SQL (optional)
+// #####################################################################################################
+// module aks './modules/cluster/aks.bicep' = if (deployAKS) { ... }
+// module sql './modules/data-factory/sql.bicep' = if (deploySQL) { ... }

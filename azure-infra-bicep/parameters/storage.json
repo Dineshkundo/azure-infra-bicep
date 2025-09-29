@@ -2,35 +2,22 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "deployKeyVault": { "value": false },
+    "deployNetworking": { "value": false },
+    "deployStorage": { "value": true },
+    "deployVMs": { "value": false },
+    "deployAKS": { "value": false },
+    "deploySQL": { "value": false },
     "storageConfig": {
       "value": {
         "storageAccountName": "devstorageacct01",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
+        "location": "eastus",
+        "sku": { "name": "Standard_LRS", "tier": "Standard" },
         "kind": "StorageV2",
         "accessTier": "Hot",
-        "tags": {
-          "env": "[parameters('env')]",
-          "project": "aftra"
-        },
-        "accessKeySecretName": "[parameters('accessKeySecretName')]",
-        "allowedIpAddresses": [],
-        "factoryResourceIds": [],
-        "subnetIds": [],
-        "blobContainers": [
-          "aks-logs",
-          "coda-dev",
-          "coda-documentuploads",
-          "coda-fileattachments",
-          "codaqa"
-        ],
-        "fileShares": [
-          "downloaded-claims",
-          "oc-payment-files"
-        ]
+        "tags": { "env": "dev", "project": "aftra" },
+        "blobContainers": ["aks-logs","coda-dev","coda-documentuploads"],
+        "fileShares": ["downloaded-claims","oc-payment-files"]
       }
     }
   }
