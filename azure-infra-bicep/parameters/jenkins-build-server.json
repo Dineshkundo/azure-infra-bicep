@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "tagSuffix": { "value": "dev" },
+    "vmConfig": {
+      "value": {
+        "vmName": "jenkins-build-server",
+        "location": "eastus",
+        "vmSize": "Standard_B2ms",
+        "zone": "",
+        "vnetName": "DevVnet",
+        "subnetName": "subnet1",
+        "imageReference": {
+          "publisher": "Canonical",
+          "offer": "UbuntuServer",
+          "sku": "22_04-lts-gen2",
+          "version": "latest"
+        },
+        "osDiskType": "Premium_LRS",
+        "osDiskSizeGB": 64
+      }
+    },
+    "secrets": {
+      "value": {
+        "adminUsername": "azureuser",
+        "sshPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu...yourkey...",
+        "extensions_username": "jenkinsadmin",
+        "extensions_ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD...extensionkey...",
+        "extensions_reset_ssh": true,
+        "extensions_remove_user": false,
+        "extensions_expiration": "2026-12-31T23:59:59Z"
+      }
+    }
+  }
+}

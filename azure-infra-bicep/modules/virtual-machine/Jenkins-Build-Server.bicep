@@ -1,21 +1,37 @@
 targetScope = 'resourceGroup'
 
+// ==========================
+// Parameters
+// ==========================
 param vmConfig object
 @secure()
 param secrets object
 
-// Create NIC
+@description('Tag suffix for resource tagging')
+param tagSuffix string
+
+// ==========================
+// Compute subnetId dynamically
+// ==========================
+var subnetId = resourceId('Microsoft.Network/virtualNetworks/subnets', vmConfig.vnetName, vmConfig.subnetName)
+
+// ==========================
+// NIC resource
+// ==========================
 resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   name: '${vmConfig.vmName}-nic'
   location: vmConfig.location
+  tags: {
+    environment: tagSuffix
+    project: 'VM'
+    createdBy: 'iac-bicep'
+  }
   properties: {
     ipConfigurations: [
       {
         name: 'ipconfig1'
         properties: {
-          subnet: {
-            id: vmConfig.subnetId
-          }
+          subnet: { id: subnetId }
           privateIPAllocationMethod: 'Dynamic'
         }
       }
@@ -23,27 +39,28 @@ resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   }
 }
 
-// Create VM
+// ==========================
+// VM resource
+// ==========================
 resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: vmConfig.vmName
   location: vmConfig.location
   zones: empty(vmConfig.zone) ? [] : [vmConfig.zone]
-  identity: {
-    type: 'SystemAssigned'
+  identity: { type: 'SystemAssigned' }
+  tags: {
+    environment: tagSuffix
+    project: 'VM'
+    createdBy: 'iac-bicep'
   }
   properties: {
-    hardwareProfile: {
-      vmSize: vmConfig.vmSize
-    }
+    hardwareProfile: { vmSize: vmConfig.vmSize }
     storageProfile: {
       imageReference: vmConfig.imageReference
       osDisk: {
         osType: 'Linux'
         createOption: 'FromImage'
         caching: 'ReadWrite'
-        managedDisk: {
-          storageAccountType: vmConfig.osDiskType
-        }
+        managedDisk: { storageAccountType: vmConfig.osDiskType }
         diskSizeGB: vmConfig.osDiskSizeGB
       }
     }
@@ -54,25 +71,18 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
         disablePasswordAuthentication: true
         ssh: {
           publicKeys: [
-            {
-              path: '/home/${secrets.adminUsername}/.ssh/authorized_keys'
-              keyData: secrets.sshPublicKey
-            }
+            { path: '/home/${secrets.adminUsername}/.ssh/authorized_keys', keyData: secrets.sshPublicKey }
           ]
         }
       }
     }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: nic.id
-        }
-      ]
-    }
+    networkProfile: { networkInterfaces: [{ id: nic.id }] }
   }
 }
 
+// ==========================
 // VM Access Extension (Optional)
+// ==========================
 resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if (!empty(secrets.extensions_username)) {
   parent: vm
   name: 'enablevmAccess'
@@ -93,7 +103,17 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' =
   }
 }
 
+// ==========================
 // Outputs
+// ==========================
 output vmId string = vm.id
 output vmName string = vm.name
 output nicId string = nic.id
+output tags object = vm.tags
+output principalId string = vm.identity.principalId
+output location string = vm.location
+output vmSize string = vm.properties.hardwareProfile.vmSize
+output osDiskType string = vm.properties.storageProfile.osDisk.managedDisk.storageAccountType
+output osDiskSizeGB int = vm.properties.storageProfile.osDisk.diskSizeGB
+output imageReference object = vm.properties.storageProfile.imageReference
+output subnetId string = subnetId

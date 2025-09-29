@@ -32,7 +32,7 @@ param tagSuffix string
 // param location string = resourceGroup().location
 
 // param keyVaultConfig object
-// param vmConfig object
+param vmConfig object
 // param vnetConfig object
 
 // // Name of the existing key vault (all VMs use the same KV for secrets)
@@ -99,20 +99,22 @@ output storageAccountName string = storage.outputs.storageAccountName
 // //// Virtual Machine//
 
 
-// @secure()
-// param secrets object
+@secure()
+param secrets object
 
-// module vm './modules/virtual-machine/vm.bicep' = {
-//   name: 'deployVM'
-//   params: {
-//     vmConfig: vmConfig
-//     secrets: secrets
-//   }
-// }
+module vm './modules/virtual-machine/Jenkins-Build-Server.bicep' = {
+  name: 'deployVM'
+  params: {
+    vmConfig: vmConfig
+    secrets: secrets
+    tagSuffix: tagSuffix
 
-// output vmId string = vm.outputs.vmId
-// output vmName string = vm.outputs.vmName
-// output nicId string = vm.outputs.nicId
+  }
+}
+
+output vmId string = vm.outputs.vmId
+output vmName string = vm.outputs.vmName
+output nicId string = vm.outputs.nicId
 
 
 // ///////////////////////////////////////////////////////////
