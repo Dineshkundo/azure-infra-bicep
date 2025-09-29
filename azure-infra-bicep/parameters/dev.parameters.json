@@ -1,0 +1,160 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+    "keyVaultConfig": {
+      "value": {
+        "keyVaultName": "dev-keyvault01",
+        "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "location": "eastus",
+        "tags": {
+          "env": "dev",
+          "project": "aftra"
+        },
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "allowedIpAddresses": ["10.0.0.1", "10.0.0.2"],
+        "subnetIds": [
+          "/subscriptions/.../subnets/dev-subnet1"
+        ],
+        "accessPolicies": [
+          {
+            "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "objectId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "permissions": {
+              "keys": ["get", "list"],
+              "secrets": ["get", "list"]
+            }
+          }
+        ]
+      }
+    },
+
+    "vmConfig": {
+      "value": {
+        "vmName": "dev-vm01",
+        "location": "eastus",
+        "zone": "1",
+        "vmSize": "Standard_DS2_v2",
+        "subnetId": "/subscriptions/.../resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/dev-subnet1",
+        "osDiskId": null,  
+        "imageReference": {
+          "publisher": "Canonical",
+          "offer": "0001-com-ubuntu-server-focal",
+          "sku": "20_04-lts",
+          "version": "latest"
+        }
+      }
+    },
+
+    "secrets": {
+      "value": {
+        "adminUsername": "azureuser",
+        "sshPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxyz...",  
+
+        "extensions_username": "azureuser",
+        "extensions_ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxyz...",
+        "extensions_reset_ssh": true,
+        "extensions_remove_user": false,
+        "extensions_expiration": "2025-12-31T23:59:59Z"
+      }
+    },
+
+    "aksConfig": {
+      "value": {
+        "aksName": "dev-aks-cluster",
+        "location": "eastus",
+        "kubernetesVersion": "1.28.2",
+        "nodeResourceGroup": "rg-dev-aks-nodes",
+        "nodeCount": 2,
+        "nodeVmSize": "Standard_DS2_v2",
+        "vnetSubnetId": "/subscriptions/.../subnets/dev-aks-subnet",
+        "tags": {
+          "env": "dev",
+          "project": "aftra"
+        }
+      }
+    },
+
+    "storageConfig": {
+      "value": {
+        "storageAccountName": "devstorageacct01",
+        "location": "eastus",
+        "sku": {
+          "name": "Standard_LRS",
+          "tier": "Standard"
+        },
+        "kind": "StorageV2",
+        "accessTier": "Hot",
+        "tags": {
+          "env": "dev",
+          "project": "aftra"
+        },
+        "accessKeySecretName": "dev-storage-key",
+        "allowedIpAddresses": ["10.0.0.1", "10.0.0.2"],
+        "factoryResourceIds": [
+          "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.DataFactory/factories/dev-adf01"
+        ],
+        "subnetIds": [
+          "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/dev-subnet1",
+          "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/dev-subnet2"
+        ],
+        "blobContainers": [
+          "akslogs",
+          "codadev",
+          "codadocumentuploads",
+          "codafileattachments",
+          "codaqa",
+          "codaregistry-images",
+          "codastoragedev",
+          "codastorageuat",
+          "codauat",
+          "copyactivity-logs",
+          "devbacpac",
+          "elasticsearch-backups-dev",
+          "insights-logs-networksecuritygroupflowevent",
+          "jenkins-backup",
+          "jenkinsserver-config-backup",
+          "sql-backup",
+          "test"
+        ],
+        "fileShares": [
+          "downloaded-claims",
+          "oc-payment-files",
+          "ssdtexecution",
+          "test-file-share"
+        ]
+      }
+    },
+
+    "vnetConfig": {
+      "value": {
+        "vnetName": "dev-vnet",
+        "location": "eastus",
+        "addressSpace": ["10.1.0.0/16"],
+        "subnets": [
+          {
+            "name": "dev-subnet1",
+            "prefix": "10.1.1.0/24",
+            "nsgId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/networkSecurityGroups/dev-nsg-public"
+          },
+          {
+            "name": "dev-subnet2",
+            "prefix": "10.1.2.0/24",
+            "nsgId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/networkSecurityGroups/dev-nsg-private",
+            "routeTableId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/routeTables/dev-rt-aks-onprem"
+          }
+        ],
+        "tags": {
+          "env": "dev",
+          "project": "aftra"
+        },
+        "remoteVnetId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-remote-vnet"
+      }
+    }
+
+  }
+}

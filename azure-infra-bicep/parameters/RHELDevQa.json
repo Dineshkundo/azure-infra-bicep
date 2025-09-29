@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vms": {
+      "value": [
+        {
+          "vmName": "RHELDevQa",
+          "location": "eastus",
+          "tags": { "Env": "DEV" },
+          "vmSize": "Standard_B4ms",
+          "publisher": "RedHat",
+          "offer": "RHEL",
+          "sku": "7lvm-gen2",
+          "version": "latest",
+          "osDiskId": "/subscriptions/.../disks/RHELDevQa_OsDisk_1",
+          "dataDiskId": "/subscriptions/.../disks/RHELDevQa-datadisk1",
+          "nicId": "/subscriptions/.../networkInterfaces/rheldevqanic",
+          "extensions": {
+            "username": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhel-username"
+              }
+            },
+            "password": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhel-password"
+              }
+            },
+            "ssh_key": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhel-sshkey"
+              }
+            },
+            "reset_ssh": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhel-resetssh"
+              }
+            },
+            "remove_user": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhel-removeuser"
+              }
+            },
+            "expiration": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhel-expiration"
+              }
+            }
+          }
+        },
+        {
+          "vmName": "RHELQaBackup",
+          "location": "eastus",
+          "tags": { "Env": "QA" },
+          "vmSize": "Standard_D4s_v3",
+          "publisher": "RedHat",
+          "offer": "RHEL",
+          "sku": "7lvm-gen2",
+          "version": "latest",
+          "osDiskId": "/subscriptions/.../disks/RHELQaBackup_OsDisk_1",
+          "dataDiskId": "/subscriptions/.../disks/RHELQaBackup-datadisk1",
+          "nicId": "/subscriptions/.../networkInterfaces/rhelqabackupnic",
+          "extensions": {
+            "username": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhelqa-username"
+              }
+            },
+            "password": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhelqa-password"
+              }
+            },
+            "ssh_key": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhelqa-sshkey"
+              }
+            },
+            "reset_ssh": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhelqa-resetssh"
+              }
+            },
+            "remove_user": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhelqa-removeuser"
+              }
+            },
+            "expiration": {
+              "reference": {
+                "keyVault": {
+                  "id": "/subscriptions/.../resourceGroups/CODA_RG/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+                },
+                "secretName": "rhelqa-expiration"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

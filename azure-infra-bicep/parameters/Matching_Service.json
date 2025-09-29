@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vms": {
+      "value": [
+        {
+          "name": "Matching-Service",
+          "zones": ["1"],
+          "tags": { "service": "matching-engine" },
+          "vmSize": "Standard_D32s_v3",
+          "additionalCapabilities": { "hibernationEnabled": false },
+          "imageReference": {
+            "publisher": "canonical",
+            "offer": "0001-com-ubuntu-server-jammy",
+            "sku": "22_04-lts-gen2",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Linux",
+            "name": "Matching-Service_OsDisk",
+            "caching": "ReadWrite",
+            "storageAccountType": "Premium_LRS",
+            "id": "/subscriptions/xxx/resourceGroups/CODA_RG/providers/Microsoft.Compute/disks/Matching-Service_OsDisk",
+            "deleteOption": "Detach",
+            "diskSizeGB": 64
+          },
+          "dataDisks": [],
+          "osProfile": {
+            "computerName": "Matching-Service",
+            "adminUsername": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-admin-username/)",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": false,
+              "provisionVMAgent": true,
+              "patchSettings": {
+                "patchMode": "ImageDefault",
+                "assessmentMode": "AutomaticByPlatform"
+              }
+            }
+          },
+          "nicId": "/subscriptions/xxx/resourceGroups/CODA_RG/providers/Microsoft.Network/networkInterfaces/matching-service427_z1",
+          "extension": {
+            "name": "enablevmAccess",
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "VMAccessForLinux",
+            "typeHandlerVersion": "1.5",
+            "settings": {},
+            "protectedSettings": {
+              "username": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-admin-username/)",
+              "password": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-admin-password/)",
+              "ssh_key": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-ssh-key/)",
+              "reset_ssh": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-reset-ssh/)",
+              "remove_user": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-remove-user/)",
+              "expiration": "@Microsoft.KeyVault(SecretUri=https://<kv-name>.vault.azure.net/secrets/matching-expiration/)"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
