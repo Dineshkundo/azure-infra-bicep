@@ -9,13 +9,10 @@ param storageConfig object
 // ==========================
 // Compute dynamic IDs from names
 // ==========================
-var subnetIds = [for subnetName in storageConfig.subnetNames: 
-  resourceId('Microsoft.Network/virtualNetworks/subnets', storageConfig.vnetName, subnetName)
-]
+var subnetIds = [for subnetName in storageConfig.subnetNames: resourceId('Microsoft.Network/virtualNetworks/subnets', storageConfig.vnetName, subnetName)]
 
-var factoryResourceIds = [for factoryName in storageConfig.factoryNames:
-  resourceId('Microsoft.DataFactory/factories', factoryName)
-]
+
+var factoryResourceIds = [for factoryName in storageConfig.factoryNames: resourceId('Microsoft.DataFactory/factories', factoryName)]
 
 // ==========================
 // Storage Account
