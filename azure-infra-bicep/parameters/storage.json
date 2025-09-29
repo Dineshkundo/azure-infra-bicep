@@ -4,7 +4,7 @@
   "parameters": {
     "storageConfig": {
       "value": {
-        "storageAccountName": "testdevstorageacct01",
+        "storageAccountName": "testdevstorage01",
         "location": "eastus",
         "sku": { "name": "Standard_LRS" },
         "kind": "StorageV2",

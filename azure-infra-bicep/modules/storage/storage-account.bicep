@@ -9,13 +9,13 @@ param storageConfig object
 // ==========================
 // Compute dynamic IDs from names
 // ==========================
-var subnetIds = [for subnetName in storageConfig.subnetNames: {
-  id: resourceId('Microsoft.Network/virtualNetworks/subnets', storageConfig.vnetName, subnetName)
-}]
+var subnetIds = [for subnetName in storageConfig.subnetNames: 
+  resourceId('Microsoft.Network/virtualNetworks/subnets', storageConfig.vnetName, subnetName)
+]
 
-var factoryResourceIds = [for factoryName in storageConfig.factoryNames: {
-  id: resourceId('Microsoft.DataFactory/factories', factoryName)
-}]
+var factoryResourceIds = [for factoryName in storageConfig.factoryNames:
+  resourceId('Microsoft.DataFactory/factories', factoryName)
+]
 
 // ==========================
 // Storage Account
@@ -50,12 +50,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
       resourceAccessRules: [
         for factoryId in factoryResourceIds: {
           tenantId: subscription().tenantId
-          resourceId: factoryId.id
+          resourceId: factoryId
         }
       ]
       virtualNetworkRules: [
         for subnetId in subnetIds: {
-          id: subnetId.id
+          id: subnetId
           action: 'Allow'
         }
       ]
