@@ -29,7 +29,7 @@
 targetScope = 'resourceGroup'
 // param location string = resourceGroup().location
 
-param keyVaultConfig object
+// param keyVaultConfig object
 // param vmConfig object
 // param vnetConfig object
 
@@ -41,15 +41,15 @@ param keyVaultConfig object
 //   name: keyVaultName
 // }
 
-module kv './modules/security/keyvault.bicep' = {
-  name: 'deployKeyVault'
-  params: {
-    config: keyVaultConfig
-  }
-}
-output keyVaultId string = kv.outputs.keyVaultId
-output keyVaultName string = kv.outputs.keyVaultName
-output keyVaultUri string = kv.outputs.keyVaultUri
+// module kv './modules/security/keyvault.bicep' = {
+//   name: 'deployKeyVault'
+//   params: {
+//     config: keyVaultConfig
+//   }
+// }
+// output keyVaultId string = kv.outputs.keyVaultId
+// output keyVaultName string = kv.outputs.keyVaultName
+// output keyVaultUri string = kv.outputs.keyVaultUri
 
 // //// Networking Module  
 
