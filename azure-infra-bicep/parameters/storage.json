@@ -4,7 +4,7 @@
   "parameters": {
     "storageConfig": {
       "value": {
-        "storageAccountName": "devstorageacct",
+        "storageAccountName": "aftrastorekey",
         "location": "eastus",
         "sku": { "name": "Standard_LRS" },
         "kind": "StorageV2",
