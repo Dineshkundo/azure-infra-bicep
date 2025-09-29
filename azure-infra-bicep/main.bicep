@@ -80,20 +80,22 @@ param vmConfig object
 
 // //// Storage Account Module
 
-param storageConfig object
+param storageConfig object = {}
 
 module storage './modules/storage/storage-account.bicep' = {
   name: 'storageModule'
   params: {
     storageConfig: storageConfig
     tagSuffix: tagSuffix
-
   }
 }
 
-
-output storageOutputs object = !empty(storageConfig) ? storage.outputs.storageOutputs : {}
-
+output storageOutputs object = {
+  storageAccountResourceId: storage.outputs.storageAccountResourceId
+  storageAccountName: storage.outputs.storageAccountName
+  principalId: storage.outputs.principalId
+  tags: storage.outputs.tags
+}
 
 // //// Virtual Machine//
 
