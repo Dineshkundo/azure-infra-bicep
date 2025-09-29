@@ -14,7 +14,7 @@
         "imageReference": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "18.10",
+          "sku": "24_04-lts",
           "version": "latest"
         },
         "osDiskType": "Premium_LRS",
