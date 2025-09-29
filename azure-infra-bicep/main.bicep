@@ -92,9 +92,8 @@ module storage './modules/storage/storage-account.bicep' = {
 }
 
 
-output storageAccountId string = storage.outputs.storageAccountResourceId
-output storagePrincipalId string = storage.outputs.principalId
-output storageAccountName string = storage.outputs.storageAccountName
+output storageOutputs object = !empty(storageConfig) ? storage.outputs.storageOutputs : {}
+
 
 // //// Virtual Machine//
 

@@ -116,7 +116,9 @@ resource shares 'Microsoft.Storage/storageAccounts/fileServices/shares@2025-01-0
 // ==========================
 // Outputs
 // ==========================
-output storageAccountResourceId string = storageAccount.id
-output storageAccountName string = storageAccount.name
-output principalId string = storageAccount.identity.principalId
-output tags object = storageAccount.tags
+output storageOutputs object = {
+  id: storageAccount.id
+  name: storageAccount.name
+  principalId: storageAccount.identity.principalId
+  tags: storageAccount.tags
+}
