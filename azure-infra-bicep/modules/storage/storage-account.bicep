@@ -7,6 +7,17 @@
 param storageConfig object
 
 // ==========================
+// Compute dynamic IDs from names
+// ==========================
+var subnetIds = [for subnetName in storageConfig.subnetNames: {
+  id: resourceId('Microsoft.Network/virtualNetworks/subnets', storageConfig.vnetName, subnetName)
+}]
+
+var factoryResourceIds = [for factoryName in storageConfig.factoryNames: {
+  id: resourceId('Microsoft.DataFactory/factories', factoryName)
+}]
+
+// ==========================
 // Storage Account
 // ==========================
 resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
@@ -22,20 +33,14 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   properties: {
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
-    allowSharedKeyAccess: false // 🔒 Disable shared key, rely on RBAC/Managed Identity
+    allowSharedKeyAccess: false
     largeFileSharesState: 'Enabled'
     supportsHttpsTrafficOnly: true
     publicNetworkAccess: 'Enabled'
     encryption: {
       services: {
-        blob: {
-          keyType: 'Account'
-          enabled: true
-        }
-        file: {
-          keyType: 'Account'
-          enabled: true
-        }
+        blob: { keyType: 'Account', enabled: true }
+        file: { keyType: 'Account', enabled: true }
       }
       keySource: 'Microsoft.Storage'
     }
@@ -43,14 +48,14 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       resourceAccessRules: [
-        for factoryId in storageConfig.factoryResourceIds: {
+        for factoryId in factoryResourceIds: {
           tenantId: subscription().tenantId
-          resourceId: factoryId
+          resourceId: factoryId.id
         }
       ]
       virtualNetworkRules: [
-        for subnetId in storageConfig.subnetIds: {
-          id: subnetId
+        for subnetId in subnetIds: {
+          id: subnetId.id
           action: 'Allow'
         }
       ]
@@ -74,14 +79,12 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2025-01-01'
   properties: {}
 }
 
-// Blob Containers (from config)
+// Blob Containers
 resource containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2025-01-01' = [
   for containerName in storageConfig.blobContainers: {
     parent: blobService
     name: containerName
-    properties: {
-      publicAccess: 'None'
-    }
+    properties: { publicAccess: 'None' }
   }
 ]
 
@@ -94,7 +97,7 @@ resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2025-01-01'
   properties: {}
 }
 
-// File Shares (from config)
+// File Shares
 resource shares 'Microsoft.Storage/storageAccounts/fileServices/shares@2025-01-01' = [
   for shareName in storageConfig.fileShares: {
     parent: fileService

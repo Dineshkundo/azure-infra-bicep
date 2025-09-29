@@ -31,7 +31,6 @@ targetScope = 'resourceGroup'
 
 param keyVaultConfig object
 // param vmConfig object
-param storageConfig object
 // param vnetConfig object
 
 // // Name of the existing key vault (all VMs use the same KV for secrets)
@@ -79,6 +78,7 @@ output keyVaultUri string = kv.outputs.keyVaultUri
 
 // //// Storage Account Module
 
+param storageConfig object
 
 module storage './modules/storage/storage-account.bicep' = {
   name: 'storageModule'
@@ -88,9 +88,9 @@ module storage './modules/storage/storage-account.bicep' = {
 }
 
 
-// output storageAccountId string = storage.outputs.storageAccountResourceId
-// output storagePrincipalId string = storage.outputs.principalId
-// output storageAccountName string = storage.outputs.storageAccountName
+output storageAccountId string = storage.outputs.storageAccountResourceId
+output storagePrincipalId string = storage.outputs.principalId
+output storageAccountName string = storage.outputs.storageAccountName
 
 // //// Virtual Machine//
 
