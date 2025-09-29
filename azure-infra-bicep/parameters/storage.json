@@ -4,7 +4,7 @@
   "parameters": {
     "storageConfig": {
       "value": {
-        "storageAccountName": "devstorageacct9876",
+        "storageAccountName": "devstorageacct",
         "location": "eastus",
         "sku": { "name": "Standard_LRS" },
         "kind": "StorageV2",
@@ -12,10 +12,13 @@
         "vnetName": "myVnet",
         "subnetNames": ["subnet1", "subnet2"],
         "factoryNames": ["DataFactory1"],
-        "allowedIpAddresses": ["52.168.1.1", "52.168.1.2/32"],
+        "allowedIpAddresses": ["52.168.1.1", "52.168.1.2"],
         "blobContainers": ["container1", "container2"],
         "fileShares": ["fileshare1", "fileshare2"]
       }
+    },
+    "tagSuffix": {
+      "value": "dev"
     }
   }
 }

@@ -27,6 +27,8 @@
 
 
 targetScope = 'resourceGroup'
+@description('Tag suffix for resource tagging')
+param tagSuffix string
 // param location string = resourceGroup().location
 
 // param keyVaultConfig object
@@ -84,6 +86,8 @@ module storage './modules/storage/storage-account.bicep' = {
   name: 'storageModule'
   params: {
     storageConfig: storageConfig
+    tagSuffix: tagSuffix
+
   }
 }
 
