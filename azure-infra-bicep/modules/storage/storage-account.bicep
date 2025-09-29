@@ -120,3 +120,7 @@ output storageAccountResourceId string = storageAccount.id
 output storageAccountName string = storageAccount.name
 output principalId string = storageAccount.identity.principalId
 output tags object = storageAccount.tags
+output location string = storageAccount.location
+output sku object = storageAccount.sku
+output kind string = storageAccount.kind
+

@@ -1,7 +1,6 @@
 // // //#####################################################################################################
 // // iac/
 // // ├── main.bicep                     # Orchestration file calling all modules
-// // ├── output.bicep                   # Optional, central outputs
 // // ├── modules/                       # All reusable modules
 // // │   ├── keyvault.bicep             # Key Vault module
 // // │   ├── virtual-machine.bicep      # VM module
@@ -9,18 +8,12 @@
 // // │   ├── storage.bicep              # Storage account + containers/shares
 // // │   ├── aks.bicep                  # AKS cluster module
 // // │   └── others/                    # Any other resource modules
-// // ├── variables/                     # Environment-specific parameter files
+// // ├── parameters/                     # Environment-specific parameter files
 // // │   ├── dev.parameters.json
 // // │   ├── uat.parameters.json
 // // │   ├── prod.parameters.json
 // // │   ├── dev.vm.variables.json      # Optional: separate VM variables if many VMs
 // // │   └── ...
-// // ├── scripts/                       # Any scripts used by Jenkins / pre/post deployments
-// // │   └── create-keyvault-secrets.sh
-// // ├── output/                        # Optional: store outputs
-// // │   ├── dev.output.json
-// // │   ├── uat.output.json
-// // │   └── prod.output.json
 // // └── Jenkinsfile                    # CI/CD pipeline
 // //#####################################################################################################
 
@@ -78,24 +71,6 @@ param vmConfig object
 // output subnet1Id string = vnet.outputs.subnet1Id
 // output subnetIds array = vnet.outputs.subnetIds
 
-// //// Storage Account Module
-
-param storageConfig object = {}
-
-module storage './modules/storage/storage-account.bicep' = {
-  name: 'storageModule'
-  params: {
-    storageConfig: storageConfig
-    tagSuffix: tagSuffix
-  }
-}
-
-output storageOutputs object = {
-  storageAccountResourceId: storage.outputs.storageAccountResourceId
-  storageAccountName: storage.outputs.storageAccountName
-  principalId: storage.outputs.principalId
-  tags: storage.outputs.tags
-}
 
 // //// Virtual Machine//
 
