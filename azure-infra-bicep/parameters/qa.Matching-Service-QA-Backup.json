@@ -5,7 +5,7 @@
     "serviceName": { "value": "Matching-Service-QA-Backup" },
     "tagSuffix": { "value": "qa" },
     "location": { "value": "eastus" },
-    "vmConfigs": {
+    "vms": {
       "value": [
         {
           "name": "Matching-Service-QA-Backup",

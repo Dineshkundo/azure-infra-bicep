@@ -89,15 +89,12 @@ module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [fo
 // ///////////////////////////////////////////////////////////
 
 
-@description('Array of VM configurations')
-param vmConfigs array
-
-
-var vmsToDeployQA = serviceName == 'Matching-Service-QA-Backup' ? vmConfigs : []
+var vmsToDeployQA = serviceName == 'Matching-Service-QA-Backup' ? vms : []
 
 module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bicep' = [for vm in vmsToDeployQA: {
   name: '${vm.name}-deploy'
   params: {
+    location: location
     vmConfig: vm
   }
 }]

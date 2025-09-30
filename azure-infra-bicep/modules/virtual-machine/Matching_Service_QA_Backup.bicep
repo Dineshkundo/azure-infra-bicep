@@ -1,5 +1,6 @@
 @description('VM configuration object')
 param vmConfig object
+param location string
 
 // ---------------- VM Resource ----------------
 resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
@@ -45,7 +46,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
 resource vmAccess 'Microsoft.Compute/virtualMachines/extensions@2024-11-01' = if (contains(vmConfig, 'extension')) {
   parent: vm
   name: vmConfig.extension.name
-  location: vmConfig.location
+  location: location
   properties: {
     autoUpgradeMinorVersion: true
     publisher: vmConfig.extension.publisher
