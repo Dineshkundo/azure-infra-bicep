@@ -5,7 +5,7 @@
     "serviceName": { "value": "keyvault" },
     "location": { "value": "eastus" },  
     "tagSuffix": { "value": "Dev" },
-    "vms": {
+    "vmConfig": {
       "value": {
         "name": "CODADEV",
         "location": "eastus",
