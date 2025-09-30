@@ -20,7 +20,7 @@ targetScope = 'resourceGroup'
 
 @allowed([
   'Jenkins-vm'
-  'Matching_Service'
+  'Matching-Service'
   'storage'
   'network'
   'keyvault'
@@ -71,7 +71,7 @@ module storage './modules/storage/storage-account.bicep' = if (serviceName == 's
 param vms array
 param location string
 
-var vmsToDeploy = serviceName == 'Matching_Service' ? vms : []
+var vmsToDeploy = serviceName == 'Matching-Service' ? vms : []
 
 module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [for vm in vmsToDeploy: {
   name: 'deploy-${vm.name}'
