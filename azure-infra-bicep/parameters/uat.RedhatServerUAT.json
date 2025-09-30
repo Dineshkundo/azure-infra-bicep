@@ -5,7 +5,7 @@
     "serviceName": { "value": "RedhatServerUAT" },
     "tagSuffix":   { "value": "UAT" },
     "location": { "value": "eastus" },
-    "vmConfigs": {
+    "vms": {
       "value": [
         {
           "name": "RedhatServerUAT",
