@@ -133,10 +133,9 @@ module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vmsT
 ////////////////////////////////////////////////////////////////////
 ///// RedhatServerUAT ///
 ///          
-@description('Array of VM configurations')
-param vmConfigs array 
 
-var vmsToDeployUAT = serviceName == 'RedhatServerUAT' ? vmConfigs : []
+
+var vmsToDeployUAT = serviceName == 'RedhatServerUAT' ? vms : []
 
 module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for vm in vmsToDeployUAT: {
   name: '${vm.name}-deployment'
