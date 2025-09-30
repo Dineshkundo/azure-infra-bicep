@@ -3,8 +3,9 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "serviceName": { "value": "KeyVault" },
+    "location": { "value": "eastus" },  
     "tagSuffix": { "value": "Dev" },
-    "keyVaultConfig": {
+    "vms": {
       "value": {
         "name": "CODADEV",
         "location": "eastus",
