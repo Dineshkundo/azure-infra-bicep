@@ -45,6 +45,21 @@ param tagSuffix string
 @secure()
 param secrets object = {}
 
+
+/////////////////////// Key Vault Module  /////
+
+
+module kv './modules/security/keyvault.bicep' = if (serviceName == 'keyvault') {
+  name: 'deployKeyVault'
+  params: {
+    config: vmConfig.keyVault
+    tagSuffix: tagSuffix
+  }
+}
+
+
+
+
 // -------------------------
 // Deploy VM if requested
 // -------------------------
@@ -132,7 +147,7 @@ module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vmsT
 
 ////////////////////////////////////////////////////////////////////
 ///// RedhatServerUAT ///
-///          
+///////////////////////////////////////////////////////////////////          
 
 
 var vmsToDeployUAT = serviceName == 'RedhatServerUAT' ? vms : []
@@ -146,39 +161,13 @@ module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for 
   }
 }]
 
-// -------------------------
-// Additional modules (network, keyvault, aks)
-// -------------------------
-// module network './modules/network/network.bicep' = if (serviceName == 'network') { ... }
-// module keyvault './modules/keyvault/keyvault.bicep' = if (serviceName == 'keyvault') { ... }
-// module aks './modules/cluster/aks.bicep' = if (serviceName == 'aks') { ... }
 
-// targetScope = 'resourceGroup'
-// @description('Tag suffix for resource tagging')
-// param tagSuffix string
-// // param location string = resourceGroup().location
 
-// // param keyVaultConfig object
-// param vmConfig object
-// param vnetConfig object
 
-// // Name of the existing key vault (all VMs use the same KV for secrets)
-// @description('Name of Key Vault that already contains the secrets')
-// param keyVaultName string
 
-// resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-//   name: keyVaultName
-// }
 
-// module kv './modules/security/keyvault.bicep' = {
-//   name: 'deployKeyVault'
-//   params: {
-//     config: keyVaultConfig
-//   }
-// }
-// output keyVaultId string = kv.outputs.keyVaultId
-// output keyVaultName string = kv.outputs.keyVaultName
-// output keyVaultUri string = kv.outputs.keyVaultUri
+
+
 
 // //// Networking Module  
 
