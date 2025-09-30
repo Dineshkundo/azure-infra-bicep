@@ -3,10 +3,18 @@ targetScope = 'resourceGroup'
 @description('Full VNet configuration object')
 param config object
 
+@description('Tag suffix for resource tagging')
+param tagSuffix string
+
+// ==========================
+// Resource: Virtual Network
+// ==========================
 resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: config.vnetName
   location: config.location
-  tags: config.tags
+  tags: union(config.tags, {
+    Environment: tagSuffix
+  })
   properties: {
     addressSpace: {
       addressPrefixes: config.addressSpace
@@ -36,7 +44,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   }
 }
 
+// ==========================
+// Outputs
+// ==========================
 output vnetId string = vnet.id
 output subnetIds array = [for s in config.subnets: '${vnet.id}/subnets/${s.name}']
 output subnet1Id string = vnet.properties.subnets[0].id
-

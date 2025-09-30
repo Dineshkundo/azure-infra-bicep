@@ -84,6 +84,21 @@ module storage './modules/storage/storage-account.bicep' = if (serviceName == 's
 }
 
 
+/////Networking Module
+param vnetConfig object
+
+
+module vnetModule './modules/networking/vnet.bicep' = if (serviceName == 'network') {
+  name: 'deployVNet'
+  params: {
+    config: vnetConfig
+    tagSuffix: tagSuffix
+  }
+}
+
+
+
+
 ///// Matching Service VM deployments
 ///
 
