@@ -102,7 +102,7 @@ module vnetModule './modules/networking/vnet.bicep' = if (serviceName == 'networ
 ///// Matching Service VM deployments
 ///
 
-param vms array
+param vms array = []
 param location string
 
 var vmsToDeploy = serviceName == 'Matching-Service' ? vms : []

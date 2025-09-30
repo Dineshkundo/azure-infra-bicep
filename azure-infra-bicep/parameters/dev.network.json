@@ -2,19 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "serviceName": {
-      "value": "network"
-    },
-    "location": {
-      "value": "eastus"
-    },
+    "serviceName": { "value": "network" },
+    "location": { "value": "eastus" },
     "vnetConfig": {
       "value": {
         "vnetName": "dev-vnet",
         "location": "eastus",
-        "addressSpace": [
-          "10.1.0.0/16"
-        ],
+        "addressSpace": ["10.1.0.0/16"],
         "subnets": [
           {
             "name": "dev-subnet1",
@@ -28,15 +22,10 @@
             "routeTableId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/routeTables/dev-rt-aks-onprem"
           }
         ],
-        "tags": {
-          "env": "dev",
-          "project": "aftra"
-        },
+        "tags": { "env": "dev", "project": "aftra" },
         "remoteVnetId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-remote-vnet"
       }
     },
-    "tagSuffix": {
-      "value": "Dev"
-    }
+    "tagSuffix": { "value": "Dev" }
   }
 }
