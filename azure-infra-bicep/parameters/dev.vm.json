@@ -2,19 +2,19 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "serviceName": { "value": "vm" },
     "tagSuffix": { "value": "dev" },
     "vmConfig": {
       "value": {
         "vmName": "jenkins-build-server",
         "location": "eastus",
         "vmSize": "Standard_B2ms",
-        "zone": "",
         "vnetName": "DevVnet",
         "subnetName": "subnet1",
         "imageReference": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "24_04-lts",
+          "sku": "22_04-lts",
           "version": "latest"
         },
         "osDiskType": "Premium_LRS",

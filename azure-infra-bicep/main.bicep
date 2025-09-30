@@ -16,7 +16,6 @@
 // // │   └── ...
 // // └── Jenkinsfile                    # CI/CD pipeline
 // //#####################################################################################################
-
 targetScope = 'resourceGroup'
 
 @allowed([
@@ -29,41 +28,48 @@ targetScope = 'resourceGroup'
 @description('Service to deploy')
 param serviceName string
 
+// Service-specific configurations
+param vmConfig object = {}
 param storageConfig object = {}
 
+// Tag suffix
 @description('Suffix for tags')
 param tagSuffix string
 
-// @description('Generic config object (per service)')
-// param config object
-
-// @secure()
-// param secrets object = {}
-
-
-module storage './modules/storage/storage-account.bicep' = if (serviceName == 'storage') {
-  name: 'storageModule'
-  params: {
-    storageConfig: storageConfig
-    tagSuffix: tagSuffix
-
-  }
-}
-////// //// Virtual Machine//
-param vmConfig object = {}
-
+// Secrets (optional)
 @secure()
 param secrets object = {}
 
+// -------------------------
+// Deploy VM if requested
+// -------------------------
 module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'vm') {
   name: 'deployVM'
   params: {
     vmConfig: vmConfig
     secrets: secrets
     tagSuffix: tagSuffix
-
   }
 }
+
+// -------------------------
+// Deploy Storage if requested
+// -------------------------
+module storage './modules/storage/storage-account.bicep' = if (serviceName == 'storage') {
+  name: 'storageModule'
+  params: {
+    storageConfig: storageConfig
+    tagSuffix: tagSuffix
+  }
+}
+
+// -------------------------
+// Additional modules (network, keyvault, aks)
+// -------------------------
+// module network './modules/network/network.bicep' = if (serviceName == 'network') { ... }
+// module keyvault './modules/keyvault/keyvault.bicep' = if (serviceName == 'keyvault') { ... }
+// module aks './modules/cluster/aks.bicep' = if (serviceName == 'aks') { ... }
+
 // targetScope = 'resourceGroup'
 // @description('Tag suffix for resource tagging')
 // param tagSuffix string

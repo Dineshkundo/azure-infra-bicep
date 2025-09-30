@@ -2,6 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "serviceName": { "value": "storage" },
+    "tagSuffix": { "value": "dev" },
     "storageConfig": {
       "value": {
         "storageAccountName": "aftrastorekey",
@@ -16,9 +18,6 @@
         "blobContainers": ["container1", "container2"],
         "fileShares": ["fileshare1", "fileshare2"]
       }
-    },
-    "tagSuffix": {
-      "value": "dev"
     }
   }
 }
