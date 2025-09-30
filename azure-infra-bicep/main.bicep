@@ -111,6 +111,7 @@ module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = [for vm in vm
   params: {
     location: location
     vmConfig: vm
+    tagSuffix: tagSuffix
   }
 }]
 

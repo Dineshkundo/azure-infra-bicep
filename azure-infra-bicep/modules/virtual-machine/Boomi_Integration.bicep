@@ -1,10 +1,17 @@
 param location string
+param tagSuffix string
 param vmConfig object
 
 resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
   name: vmConfig.name
   location: location
-  tags: vmConfig.tags
+  // Merge vmConfig.tags with tagSuffix
+  tags: union(
+    vmConfig.tags,
+    {
+      TagSuffix: tagSuffix
+    }
+  )
   zones: vmConfig.zones
   identity: {
     type: 'SystemAssigned'
@@ -34,8 +41,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
     osProfile: {
       computerName: vmConfig.osProfile.computerName
       adminUsername: vmConfig.osProfile.adminUsername
-      linuxConfiguration: vmConfig.osProfile.linuxConfiguration
-      windowsConfiguration: vmConfig.osProfile.windowsConfiguration
+      linuxConfiguration: contains(vmConfig.osProfile, 'linuxConfiguration') ? vmConfig.osProfile.linuxConfiguration : null
+      windowsConfiguration: contains(vmConfig.osProfile, 'windowsConfiguration') ? vmConfig.osProfile.windowsConfiguration : null
       secrets: []
       allowExtensionOperations: true
       requireGuestProvisionSignal: true
@@ -74,5 +81,6 @@ resource vmAccess 'Microsoft.Compute/virtualMachines/extensions@2024-11-01' = if
     protectedSettings: vmConfig.extension.protectedSettings
   }
 }
+
 output vmId string = vm.id
 output vmName string = vm.name
