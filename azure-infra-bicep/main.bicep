@@ -24,6 +24,7 @@ targetScope = 'resourceGroup'
   'Matching-Service-QA-Backup'
   'Boomi_Integration'
   'RHELDevQa'
+  'RedhatServerUAT'
   'storage'
   'network'
   'keyvault'
@@ -129,6 +130,22 @@ module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vmsT
   }
 }]
 
+////////////////////////////////////////////////////////////////////
+///// RedhatServerUAT ///
+///          
+@description('Array of VM configurations')
+param vmConfigs array 
+
+var vmsToDeployUAT = serviceName == 'RedhatServerUAT' ? vmConfigs : []
+
+module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for vm in vmsToDeployUAT: {
+  name: '${vm.name}-deployment'
+  params: {
+    vmConfig: vm
+    location: location
+    tagSuffix: tagSuffix
+  }
+}]
 
 // -------------------------
 // Additional modules (network, keyvault, aks)
@@ -202,19 +219,8 @@ module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vmsT
 
 
 
-// ////////////////////////////////////////////////////////////////////
-// ///// RedhatServerUAT ///
-// ///          
-// @description('Array of VM configurations')
-// param vmConfigs array 
 
-// module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for vm in vmConfigs: {
-//   name: '${vm.name}-deployment'
-//   params: {
-//     vmConfig: vm
-//     location: location
-//   }
-// }]
+
 // //// AKS and SQL Modules
 // // module aks './modules/cluster/aks.bicep' = {
 // //   name: 'deployAKS'

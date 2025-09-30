@@ -1,10 +1,18 @@
+@description('VM configuration object')
 param vmConfig object
+
+@description('Environment tag suffix (e.g. dev, qa, uat)')
+param tagSuffix string
+
+@description('Deployment location')
 param location string = resourceGroup().location
 
 resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
-  name: vmConfig.name
+  name: '${vmConfig.name}-${tagSuffix}'
   location: location
-  tags: vmConfig.tags
+  tags: union(vmConfig.tags, {
+    EnvSuffix: tagSuffix
+  })
   identity: {
     type: 'SystemAssigned'
   }
@@ -19,7 +27,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
       diskControllerType: 'SCSI'
     }
     osProfile: {
-      computerName: vmConfig.name
+      computerName: '${vmConfig.name}-${tagSuffix}'
       adminUsername: vmConfig.adminUsername
       linuxConfiguration: vmConfig.linuxConfiguration
       secrets: []
@@ -64,5 +72,6 @@ resource vmAccess 'Microsoft.Compute/virtualMachines/extensions@2024-11-01' = if
     }
   }
 }
+
 output vmId string = vm.id
 output vmName string = vm.name
