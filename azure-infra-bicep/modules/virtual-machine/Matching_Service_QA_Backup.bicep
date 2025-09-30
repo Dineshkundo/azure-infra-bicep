@@ -5,7 +5,7 @@ param location string
 // ---------------- VM Resource ----------------
 resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
   name: vmConfig.name
-  location: vmConfig.location
+  location: location
   tags: vmConfig.tags
   zones: [
     vmConfig.zone
