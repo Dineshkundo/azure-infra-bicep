@@ -22,6 +22,7 @@ targetScope = 'resourceGroup'
   'Jenkins-vm'
   'Matching-Service'
   'Matching-Service-QA-Backup'
+  'Boomi_Integration'
   'storage'
   'network'
   'keyvault'
@@ -85,7 +86,7 @@ module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [fo
 //
 
 // ///////////////////////////////////////////////////////////
-// Deploy Matching Service VMs from configuration array  ////
+// Deploy Matching Service QA Backup VMs from configuration array  ////
 // ///////////////////////////////////////////////////////////
 
 
@@ -93,6 +94,20 @@ var vmsToDeployQA = serviceName == 'Matching-Service-QA-Backup' ? vms : []
 
 module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bicep' = [for vm in vmsToDeployQA: {
   name: '${vm.name}-deploy'
+  params: {
+    location: location
+    vmConfig: vm
+  }
+}]
+
+/// ///////////////////////////////////////////////////////////
+//               Boomi_Integration
+///////////////////////////////////////////////////////////////
+
+var vmsToDeployBoomi = serviceName == 'Boomi_Integration' ? vms : []
+
+module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = [for vm in vmsToDeployBoomi: {
+  name: 'deploy-${vm.name}'
   params: {
     location: location
     vmConfig: vm
@@ -160,35 +175,6 @@ module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bic
 
 
 
-
-// ///////////////////////////////////////////////////////////
-
-// // Deploy VMs from configs
-// module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bicep' = [for vm in vmConfigs: {
-//   name: '${vm.name}-deploy'
-//   params: {
-//     name: vm.name
-//     location: vm.location
-//     tags: vm.tags
-//     vmSize: vm.vmSize
-//     image: vm.image
-//     osDisk: vm.osDisk
-//     dataDisks: vm.dataDisks
-//     nicId: vm.nicId
-//     security: vm.security
-//     diagnostics: vm.diagnostics
-//     zone: vm.zone
-
-//     // 🔑 Secure params from Key Vault
-//     adminUsername: keyVault.getSecret(vm.adminUsernameSecret)
-//     extensionUsername: keyVault.getSecret(vm.extensionSecrets.username)
-//     extensionPassword: keyVault.getSecret(vm.extensionSecrets.password)
-//     extensionSshKey: keyVault.getSecret(vm.extensionSecrets.ssh_key)
-//     extensionResetSsh: keyVault.getSecret(vm.extensionSecrets.reset_ssh)
-//     extensionRemoveUser: keyVault.getSecret(vm.extensionSecrets.remove_user)
-//     extensionExpiration: keyVault.getSecret(vm.extensionSecrets.expiration)
-//   }
-// }]
 // ///////////////////////////////////////////////////////////
 // // RHEL Dev/QA VM deployments
 // @description('Array of VM configurations')
@@ -220,13 +206,7 @@ module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bic
 
 // ///////////////////////////////////////////////////////////
 
-// module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = [for vm in vms: {
-//   name: 'deploy-${vm.name}'
-//   params: {
-//     location: location
-//     vmConfig: vm
-//   }
-// }]
+
 
 
 
