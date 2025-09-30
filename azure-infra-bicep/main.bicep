@@ -88,6 +88,7 @@ module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [fo
 // Deploy Matching Service VMs from configuration array  ////
 // ///////////////////////////////////////////////////////////
 
+
 @description('Array of VM configurations')
 param vmConfigs array
 

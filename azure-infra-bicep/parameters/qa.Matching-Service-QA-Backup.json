@@ -2,14 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "keyVaultName": {
-      "value": "MySharedKeyVault"
-    },
-    "vmConfigs": {
+    "serviceName": { "value": "Matching-Service-QA-Backup" },
+    "tagSuffix": { "value": "qa" },
+    "location": { "value": "eastus" },
+    "vms": {
       "value": [
         {
           "name": "Matching-Service-QA-Backup",
-          "location": "eastus",
           "tags": { "matching": "qa-backup" },
           "zone": "1",
           "vmSize": "Standard_D8s_v3",
@@ -30,11 +29,7 @@
           },
           "dataDisks": [],
           "nicId": "/subscriptions/<subid>/resourceGroups/CODA_RG/providers/Microsoft.Network/networkInterfaces/matching-service-qa-backup123_z1",
-          "securityProfile": {
-            "encryptionAtHost": true,
-            "securityType": "TrustedLaunch",
-            "uefiSettings": { "secureBootEnabled": true, "vTpmEnabled": true }
-          },
+          "security": { "encryptionAtHost": true },
           "diagnostics": { "bootEnabled": true },
           "osProfile": {
             "computerName": "Matching-Service-QA-Backup",
