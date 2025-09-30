@@ -42,10 +42,11 @@ resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
 // ==========================
 // VM resource
 // ==========================
+
 resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: vmConfig.vmName
   location: vmConfig.location
-  zones: empty(vmConfig.zone) ? [] : [vmConfig.zone]
+  zones: empty(vmConfig.?zone) ? [] : [vmConfig.zone]
   identity: { type: 'SystemAssigned' }
   tags: {
     environment: tagSuffix
