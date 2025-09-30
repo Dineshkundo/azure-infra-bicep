@@ -19,7 +19,7 @@
 targetScope = 'resourceGroup'
 
 @allowed([
-  'vm'
+  'Jenkins-vm'
   'storage'
   'network'
   'keyvault'
@@ -43,7 +43,7 @@ param secrets object = {}
 // -------------------------
 // Deploy VM if requested
 // -------------------------
-module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'vm') {
+module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'Jenkins-vm') {
   name: 'deployVM'
   params: {
     vmConfig: vmConfig
