@@ -3,25 +3,25 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "serviceName": { "value": "keyvault" },
-    "location": { "value": "eastus" },  
+    "location": { "value": "eastus" },
     "tagSuffix": { "value": "Dev" },
-    "vmConfig": {
-      "value": {
-        "name": "CODADEV",
-        "location": "eastus",
-        "tenantId": "2eb52881-f5b4-4855-9142-cd907aa33267",
-        "vnetResourceId": "/subscriptions/xxxx/resourceGroups/xxxx/providers/Microsoft.Network/virtualNetworks/devvnet",
-        "subnetNames": [ "subnet1", "subnet2" ],
-        "allowedIPs": [ "38.79.64.66/32" ],
-        "accessObjectIds": [ "0ff85311-83bd-42c2-ae13-edce2b0cd316" ],
-        "tags": {
-          "CODA-RG": "KeyVault"
-        },
-        "secrets": [
-          { "name": "db-username", "value": "codauser" },
-          { "name": "db-password", "value": "Sup3rS3cure!" }
-        ]
-      }
+    "vms": {
+      "value": [
+        {
+          "name": "CODADEV",
+          "location": "eastus",
+          "tenantId": "2eb52881-f5b4-4855-9142-cd907aa33267",
+          "vnetResourceId": "/subscriptions/xxxx/resourceGroups/xxxx/providers/Microsoft.Network/virtualNetworks/devvnet",
+          "subnetNames": ["subnet1","subnet2"],
+          "allowedIPs": ["38.79.64.66/32"],
+          "accessObjectIds": ["0ff85311-83bd-42c2-ae13-edce2b0cd316"],
+          "tags": { "CODA-RG": "KeyVault" },
+          "secrets": [
+            { "name": "db-username", "value": "codauser" },
+            { "name": "db-password", "value": "Sup3rS3cure!" }
+          ]
+        }
+      ]
     }
   }
 }
