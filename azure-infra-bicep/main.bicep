@@ -17,15 +17,60 @@
 // // └── Jenkinsfile                    # CI/CD pipeline
 // //#####################################################################################################
 
-
-
 targetScope = 'resourceGroup'
-@description('Tag suffix for resource tagging')
-param tagSuffix string
-// param location string = resourceGroup().location
 
-// param keyVaultConfig object
+@allowed([
+  'vm'
+  'storage'
+  'network'
+  'keyvault'
+  'aks'
+])
+@description('Service to deploy')
+param serviceName string
+
+param storageConfig object
+
+@description('Suffix for tags')
+param tagSuffix string
+
+// @description('Generic config object (per service)')
+// param config object
+
+// @secure()
+// param secrets object = {}
+
+
+module storage './modules/storage/storage-account.bicep' = if (serviceName == 'storage') {
+  name: 'storageModule'
+  params: {
+    storageConfig: storageConfig
+    tagSuffix: tagSuffix
+
+  }
+}
+////// //// Virtual Machine//
 param vmConfig object
+
+@secure()
+param secrets object
+
+module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'vm') {
+  name: 'deployVM'
+  params: {
+    vmConfig: vmConfig
+    secrets: secrets
+    tagSuffix: tagSuffix
+
+  }
+}
+// targetScope = 'resourceGroup'
+// @description('Tag suffix for resource tagging')
+// param tagSuffix string
+// // param location string = resourceGroup().location
+
+// // param keyVaultConfig object
+// param vmConfig object
 // param vnetConfig object
 
 // // Name of the existing key vault (all VMs use the same KV for secrets)
