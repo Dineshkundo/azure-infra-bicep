@@ -48,14 +48,14 @@ param secrets object = {}
 
 /////////////////////// Key Vault Module  /////
 
-
-module kv './modules/security/keyvault.bicep' = if (serviceName == 'keyvault') {
-  name: 'deployKeyVault'
+var vmsToDeployKV = serviceName == 'keyvault' ? vms : []
+module kv './modules/security/keyvault.bicep' = [for vmConfig in vmsToDeployKV: {
+  name: 'deployKeyVault-${vmConfig.name}'
   params: {
-    config: vmConfig.keyVault
+    config: vmConfig
     tagSuffix: tagSuffix
   }
-}
+}]
 
 
 
