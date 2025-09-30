@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "serviceName": { "value": "Matching-Service-QA-Backup" },
-    "tagSuffix": { "value": "qa" },
+    "tagSuffix": { "value": "dev" },
     "location": { "value": "eastus" },
     "vms": {
       "value": [
