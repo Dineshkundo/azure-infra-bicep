@@ -41,8 +41,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
     osProfile: {
       computerName: vmConfig.osProfile.computerName
       adminUsername: vmConfig.osProfile.adminUsername
-      linuxConfiguration: contains(vmConfig.osProfile, 'linuxConfiguration') ? vmConfig.osProfile.linuxConfiguration : null
-      windowsConfiguration: contains(vmConfig.osProfile, 'windowsConfiguration') ? vmConfig.osProfile.windowsConfiguration : null
+      linuxConfiguration: vmConfig.osProfile.linuxConfiguration
+      windowsConfiguration: vmConfig.osProfile.windowsConfiguration
       secrets: []
       allowExtensionOperations: true
       requireGuestProvisionSignal: true
