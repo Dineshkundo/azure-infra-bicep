@@ -1,53 +1,36 @@
-@secure()
-param extensions_enablevmAccess_username string
-@secure()
-param extensions_enablevmAccess_password string
-@secure()
-param extensions_enablevmAccess_ssh_key string
-@secure()
-param extensions_enablevmAccess_reset_ssh string
-@secure()
-param extensions_enablevmAccess_remove_user string
-@secure()
-param extensions_enablevmAccess_expiration string
+@description('VM configuration object')
+param vmConfig object
 
-param vmName string
-param location string
-param tags object
-param vmSize string
-param publisher string
-param offer string
-param sku string
-param version string
-param osDiskId string
-param dataDiskId string
-param nicId string
+@description('Tag suffix for environment (e.g., dev, qa, uat)')
+param tagSuffix string
 
 resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
-  name: vmName
-  location: location
-  tags: tags
+  name: '${vmConfig.vmName}-${tagSuffix}'
+  location: vmConfig.location
+  tags: union(vmConfig.tags, {
+    TagSuffix: tagSuffix
+  })
   identity: {
     type: 'SystemAssigned'
   }
   properties: {
     hardwareProfile: {
-      vmSize: vmSize
+      vmSize: vmConfig.vmSize
     }
     storageProfile: {
       imageReference: {
-        publisher: publisher
-        offer: offer
-        sku: sku
-        version: version
+        publisher: vmConfig.publisher
+        offer: vmConfig.offer
+        sku: vmConfig.sku
+        version: vmConfig.version
       }
       osDisk: {
         osType: 'Linux'
-        name: '${vmName}_OsDisk_1'
+        name: '${vmConfig.vmName}_OsDisk_1'
         createOption: 'FromImage'
         caching: 'ReadWrite'
         managedDisk: {
-          id: osDiskId
+          id: vmConfig.osDiskId
         }
         deleteOption: 'Detach'
         diskSizeGB: 64
@@ -55,11 +38,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
       dataDisks: [
         {
           lun: 0
-          name: '${vmName}-datadisk1'
+          name: '${vmConfig.vmName}-datadisk1'
           createOption: 'Attach'
           caching: 'None'
           managedDisk: {
-            id: dataDiskId
+            id: vmConfig.dataDiskId
           }
           deleteOption: 'Detach'
           diskSizeGB: 64
@@ -67,8 +50,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
       ]
     }
     osProfile: {
-      computerName: vmName
-      adminUsername: extensions_enablevmAccess_username
+      computerName: vmConfig.vmName
+      adminUsername: vmConfig.adminUsername
       linuxConfiguration: {
         disablePasswordAuthentication: false
         provisionVMAgent: true
@@ -77,17 +60,17 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: nicId
+          id: vmConfig.nicId
         }
       ]
     }
   }
 }
 
-resource enableVmAccess 'Microsoft.Compute/virtualMachines/extensions@2024-11-01' = {
+resource enableVmAccess 'Microsoft.Compute/virtualMachines/extensions@2024-11-01' = if (vmConfig.extensions != null) {
   parent: vm
   name: 'enablevmAccess'
-  location: location
+  location: vmConfig.location
   properties: {
     autoUpgradeMinorVersion: true
     publisher: 'Microsoft.OSTCExtensions'
@@ -95,14 +78,14 @@ resource enableVmAccess 'Microsoft.Compute/virtualMachines/extensions@2024-11-01
     typeHandlerVersion: '1.5'
     settings: {}
     protectedSettings: {
-      username: extensions_enablevmAccess_username
-      password: extensions_enablevmAccess_password
-      ssh_key: extensions_enablevmAccess_ssh_key
-      reset_ssh: extensions_enablevmAccess_reset_ssh
-      remove_user: extensions_enablevmAccess_remove_user
-      expiration: extensions_enablevmAccess_expiration
+      username: vmConfig.extensions.username
+      ssh_key: vmConfig.extensions.ssh_key
+      reset_ssh: vmConfig.extensions.reset_ssh
+      remove_user: vmConfig.extensions.remove_user
+      expiration: vmConfig.extensions.expiration
     }
   }
 }
+
 output vmId string = vm.id
-output vmName string = vm.name  
+output vmName string = vm.name

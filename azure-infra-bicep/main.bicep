@@ -23,6 +23,7 @@ targetScope = 'resourceGroup'
   'Matching-Service'
   'Matching-Service-QA-Backup'
   'Boomi_Integration'
+  'RHELDevQa'
   'storage'
   'network'
   'keyvault'
@@ -115,6 +116,20 @@ module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = [for vm in vm
   }
 }]
 
+/// ///////////////////////////////////////////////////////////
+//               RHELDevQa  
+///////////////////////////////////////////////////////////////
+
+var vmsToDeployRHELDevQa = serviceName == 'RHELDevQa' ? vms : []
+module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vmsToDeployRHELDevQa: {
+  name: 'deploy-${vm.vmName}-${tagSuffix}'
+  params: {
+    vmConfig: vm
+    tagSuffix: tagSuffix
+  }
+}]
+
+
 // -------------------------
 // Additional modules (network, keyvault, aks)
 // -------------------------
@@ -176,33 +191,7 @@ module Boomi './modules/virtual-machine/Boomi_Integration.bicep' = [for vm in vm
 
 
 
-// ///////////////////////////////////////////////////////////
-// // RHEL Dev/QA VM deployments
-// @description('Array of VM configurations')
-// param vms array
 
-// module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vms: {
-//   name: 'deploy-${vm.vmName}'
-//   params: {
-//     vmName: vm.vmName
-//     location: vm.location
-//     tags: vm.tags
-//     vmSize: vm.vmSize
-//     publisher: vm.publisher
-//     offer: vm.offer
-//     sku: vm.sku
-//     version: vm.version
-//     osDiskId: vm.osDiskId
-//     dataDiskId: vm.dataDiskId
-//     nicId: vm.nicId
-//     extensions_enablevmAccess_username: vm.extensions.username
-//     extensions_enablevmAccess_password: vm.extensions.password
-//     extensions_enablevmAccess_ssh_key: vm.extensions.ssh_key
-//     extensions_enablevmAccess_reset_ssh: vm.extensions.reset_ssh
-//     extensions_enablevmAccess_remove_user: vm.extensions.remove_user
-//     extensions_enablevmAccess_expiration: vm.extensions.expiration
-//   }
-// }]
 
 
 // ///////////////////////////////////////////////////////////

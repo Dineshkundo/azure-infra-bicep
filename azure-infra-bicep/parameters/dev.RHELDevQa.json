@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "serviceName": { "value": "RHELDevQa" },
+    "tagSuffix":   { "value": "dev" },
+    "location": { "value": "eastus" },
+    "vms": {
+      "value": [
+        {
+          "vmName": "RHELDevQa",
+          "location": "eastus",
+          "tags": { "Env": "DEV" },
+          "vmSize": "Standard_B4ms",
+          "publisher": "RedHat",
+          "offer": "RHEL",
+          "sku": "7lvm-gen2",
+          "version": "latest",
+          "osDiskId": "/subscriptions/.../disks/RHELDevQa_OsDisk_1",
+          "dataDiskId": "/subscriptions/.../disks/RHELDevQa-datadisk1",
+          "nicId": "/subscriptions/.../networkInterfaces/rheldevqanic",
+          "extensions": {
+            "username": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhel-username/)",
+            "password": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhel-password/)",
+            "ssh_key": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhel-sshkey/)",
+            "reset_ssh": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhel-resetssh/)",
+            "remove_user": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhel-removeuser/)",
+            "expiration": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhel-expiration/)"
+          }
+        },
+        {
+          "vmName": "RHELQaBackup",
+          "location": "eastus",
+          "tags": { "Env": "QA" },
+          "vmSize": "Standard_D4s_v3",
+          "publisher": "RedHat",
+          "offer": "RHEL",
+          "sku": "7lvm-gen2",
+          "version": "latest",
+          "osDiskId": "/subscriptions/.../disks/RHELQaBackup_OsDisk_1",
+          "dataDiskId": "/subscriptions/.../disks/RHELQaBackup-datadisk1",
+          "nicId": "/subscriptions/.../networkInterfaces/rhelqabackupnic",
+          "extensions": {
+            "username": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhelqa-username/)",
+            "password": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhelqa-password/)",
+            "ssh_key": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhelqa-sshkey/)",
+            "reset_ssh": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhelqa-resetssh/)",
+            "remove_user": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhelqa-removeuser/)",
+            "expiration": "@Microsoft.KeyVault(SecretUri=https://MyKeyVault.vault.azure.net/secrets/rhelqa-expiration/)"
+          }
+        }
+      ]
+    }
+  }
+}
