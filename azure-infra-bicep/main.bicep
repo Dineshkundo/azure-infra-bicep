@@ -29,7 +29,7 @@ targetScope = 'resourceGroup'
 @description('Service to deploy')
 param serviceName string
 
-param storageConfig object
+param storageConfig object = {}
 
 @description('Suffix for tags')
 param tagSuffix string
@@ -50,10 +50,10 @@ module storage './modules/storage/storage-account.bicep' = if (serviceName == 's
   }
 }
 ////// //// Virtual Machine//
-param vmConfig object
+param vmConfig object = {}
 
 @secure()
-param secrets object
+param secrets object = {}
 
 module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'vm') {
   name: 'deployVM'
