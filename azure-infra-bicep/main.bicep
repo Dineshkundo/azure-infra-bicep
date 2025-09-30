@@ -21,6 +21,7 @@ targetScope = 'resourceGroup'
 @allowed([
   'Jenkins-vm'
   'Matching-Service'
+  'Matching-Service-QA-Backup'
   'storage'
   'network'
   'keyvault'
@@ -77,6 +78,25 @@ module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [fo
   name: 'deploy-${vm.name}'
   params: {
     location: location
+    vmConfig: vm
+  }
+}]
+
+//
+
+// ///////////////////////////////////////////////////////////
+// Deploy Matching Service VMs from configuration array
+// ///////////////////////////////////////////////////////////
+
+@description('Array of VM configurations')
+param vmConfigs array
+
+
+var vmsToDeployQA = serviceName == 'Matching-Service-QA-Backup' ? vmConfigs : []
+
+module MatchingService './modules/virtual-machine/Matching_Service_QA_Backup.bicep' = [for vm in vmsToDeployQA: {
+  name: '${vm.name}-deploy'
+  params: {
     vmConfig: vm
   }
 }]
@@ -211,17 +231,7 @@ module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [fo
 // }]
 
 
-// ///////////////////////////////////////////////////////////
-// ///// Matching Service VM deployments
-// ///
 
-// module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [for vm in vms: {
-//   name: 'deploy-${vm.name}'
-//   params: {
-//     location: location
-//     vmConfig: vm
-//   }
-// }]
 
 
 // ////////////////////////////////////////////////////////////////////
