@@ -11,20 +11,44 @@
     "tagSuffix": {
       "value": "dev"
     },
-    "vnetConfig": {
-      "value": {
-        "name": "devvnet",
-        "resourceGroup": "coda_rg",
-        "subscriptionId": "d629b553-466f-4caa-b64b-9ba2bae97c3f",
-        "subnets": [
-          "subnet1",
-          "azurefirewallsubnet",
-          "gatewaysubnet",
-          "subnet2",
-          "azurefirewallmanagementsubnet",
-          "subnet3"
-        ]
-      }
+    "vms": {
+      "value": [
+        {
+          "name": "coda-dev-kv",
+          "location": "eastus",
+          "tenantId": "2eb52881-f5b4-4855-9142-cd907aa33267",
+          "tags": {
+            "Owner": "DevTeam",
+            "Project": "CODA"
+          },
+          "vnetResourceId": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/Microsoft.Network/virtualNetworks/devvnet",
+          "subnetNames": [
+            "subnet1",
+            "azurefirewallsubnet",
+            "gatewaysubnet"
+          ],
+          "allowedIPs": [
+            "38.79.64.66/32"
+          ],
+          "accessObjectIds": [
+            "0ff85311-83bd-42c2-ae13-edce2b0cd316"
+          ],
+          "secrets": [
+            {
+              "name": "DbPassword",
+              "value": "SuperSecureP@ss123"
+            },
+            {
+              "name": "ApiKey",
+              "value": "abcd1234-efgh5678"
+            },
+            {
+              "name": "StorageKey",
+              "value": "xyz-9999-key"
+            }
+          ]
+        }
+      ]
     }
   }
 }
