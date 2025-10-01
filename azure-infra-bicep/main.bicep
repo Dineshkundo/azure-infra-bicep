@@ -180,50 +180,6 @@ module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for 
 
 
 
-
-
-
-
-// //// Networking Module  
-
-// param nsgPublicSubnetId string
-// param nsgPrivateSubnetId string
-// param rtFirewallMgmtId string
-// param rtAksOnPremId string
-// param remoteVnetId string
-
-// module vnet './modules/networking/vnet.bicep' = {
-//   name: 'deployVNet'
-//   params: {
-//     config: union(vnetConfig, {
-//       nsgPublicSubnetId: nsgPublicSubnetId
-//       nsgPrivateSubnetId: nsgPrivateSubnetId
-//       rtFirewallMgmtId: rtFirewallMgmtId
-//       rtAksOnPremId: rtAksOnPremId
-//       remoteVnetId: remoteVnetId
-//     })
-//   }
-// }
-
-// output vnetId string = vnet.outputs.vnetId
-// output subnet1Id string = vnet.outputs.subnet1Id
-// output subnetIds array = vnet.outputs.subnetIds
-
-
-
-
-
-
-// ///////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
 // //// AKS and SQL Modules
 // // module aks './modules/cluster/aks.bicep' = {
 // //   name: 'deployAKS'

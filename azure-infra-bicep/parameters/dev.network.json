@@ -13,17 +13,17 @@
           {
             "name": "dev-subnet1",
             "prefix": "10.1.1.0/24",
-            "nsgId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/networkSecurityGroups/dev-nsg-public"
+            "nsgId": "/subscriptions/<Sub-id>/resourceGroups/dev-rg/providers/Microsoft.Network/networkSecurityGroups/dev-nsg-public"
           },
           {
             "name": "dev-subnet2",
             "prefix": "10.1.2.0/24",
-            "nsgId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/networkSecurityGroups/dev-nsg-private",
-            "routeTableId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/routeTables/dev-rt-aks-onprem"
+            "nsgId": "/subscriptions/<Sub-id>/resourceGroups/dev-rg/providers/Microsoft.Network/networkSecurityGroups/dev-nsg-private",
+            "routeTableId": "/subscriptions/<Sub-id>/resourceGroups/dev-rg/providers/Microsoft.Network/routeTables/dev-rt-aks-onprem"
           }
         ],
         "tags": { "env": "dev", "project": "aftra" },
-        "remoteVnetId": "/subscriptions/xxxx/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-remote-vnet"
+        "remoteVnetId": "/subscriptions/<Sub-id>/resourceGroups/dev-rg/providers/Microsoft.Network/virtualNetworks/dev-remote-vnet"
       }
     },
     "tagSuffix": { "value": "Dev" }
