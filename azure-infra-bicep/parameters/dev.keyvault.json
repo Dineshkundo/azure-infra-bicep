@@ -1,222 +1,30 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
-  "resources": [
-    {
-      "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2024-12-01-preview",
-      "name": "CODADEV",
-      "location": "eastus",
-      "tags": {
-        "CODA-RG": "Dev"
-      },
-      "properties": {
-        "sku": {
-          "family": "A",
-          "name": "Standard"
-        },
-        "tenantId": "2eb52881-f5b4-4855-9142-cd907aa33267",
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "defaultAction": "Deny",
-          "ipRules": [
-            {
-              "value": "38.79.64.66/32"
-            }
-          ],
-          "virtualNetworkRules": [
-            {
-              "id": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/microsoft.network/virtualnetworks/devvnet/subnets/subnet1",
-              "ignoreMissingVnetServiceEndpoint": false
-            },
-            {
-              "id": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/microsoft.network/virtualnetworks/devvnet/subnets/azurefirewallsubnet",
-              "ignoreMissingVnetServiceEndpoint": false
-            },
-            {
-              "id": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/microsoft.network/virtualnetworks/devvnet/subnets/gatewaysubnet",
-              "ignoreMissingVnetServiceEndpoint": false
-            },
-            {
-              "id": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/microsoft.network/virtualnetworks/devvnet/subnets/subnet2",
-              "ignoreMissingVnetServiceEndpoint": false
-            },
-            {
-              "id": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/microsoft.network/virtualnetworks/devvnet/subnets/azurefirewallmanagementsubnet",
-              "ignoreMissingVnetServiceEndpoint": false
-            },
-            {
-              "id": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/microsoft.network/virtualnetworks/devvnet/subnets/subnet3",
-              "ignoreMissingVnetServiceEndpoint": false
-            }
-          ]
-        },
-        "accessPolicies": [
-          {
-            "tenantId": "2eb52881-f5b4-4855-9142-cd907aa33267",
-            "objectId": "0ff85311-83bd-42c2-ae13-edce2b0cd316",
-            "permissions": {
-              "keys": [
-                "Get",
-                "WrapKey",
-                "UnwrapKey"
-              ],
-              "secrets": [],
-              "certificates": []
-            }
-          }
-        ],
-        "enabledForDeployment": true,
-        "enabledForDiskEncryption": true,
-        "enabledForTemplateDeployment": true,
-        "enableSoftDelete": true,
-        "softDeleteRetentionInDays": 90,
-        "enableRbacAuthorization": true,
-        "enablePurgeProtection": true,
-        "publicNetworkAccess": "Enabled"
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "serviceName": {
+      "value": "keyvault"
+    },
+    "tagSuffix": {
+      "value": "dev"
+    },
+    "vnetConfig": {
+      "value": {
+        "name": "devvnet",
+        "resourceGroup": "coda_rg",
+        "subscriptionId": "d629b553-466f-4caa-b64b-9ba2bae97c3f",
+        "subnets": [
+          "subnet1",
+          "azurefirewallsubnet",
+          "gatewaysubnet",
+          "subnet2",
+          "azurefirewallmanagementsubnet",
+          "subnet3"
+        ]
       }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/Encryption-Key-for-Disks"
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/jenkins"
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/matching-qa"
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/matching-uat"
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/redhatserveruat"
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/rheldev"
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/test11"
     }
-    ,
-    {
-      "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true,
-          "exportable": false
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/CODADEVsa-key"
-    }
-    ,
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "apiVersion": "2024-12-01-preview",
-      "location": "eastus",
-      "properties": {
-        "attributes": {
-          "enabled": true
-        }
-      },
-      "dependsOn": [
-        "Microsoft.KeyVault/vaults/CODADEV"
-      ],
-      "name": "CODADEV/6CAD316F-5953-4D76-964F-8CF2B99F80BB"
-    }
-    // ------------------------------
-    // 🔽 Continue adding each secret
-    // exactly as you listed them
-    // e.g. "CODADEV/ACRPASSWD",
-    // "CODADEV/ACRUSERNAME", etc.
-    // ------------------------------
-  ]
+  }
 }
