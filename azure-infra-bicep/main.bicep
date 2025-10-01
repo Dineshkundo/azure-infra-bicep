@@ -49,10 +49,10 @@ param secrets object = {}
 /////////////////////// Key Vault Module  /////
 
 var vmsToDeployKV = serviceName == 'keyvault' ? vms : []
-module kv './modules/security/keyvault.bicep' = [for vmConfig in vmsToDeployKV: {
-  name: 'deployKeyVault-${vmConfig.name}'
+module kv './modules/security/keyvault.bicep' = [for secrets in vmsToDeployKV: {
+  name: 'deployKeyVault-${secrets.name}'
   params: {
-    config: vmConfig
+    config: secrets
     tagSuffix: tagSuffix
   }
 }]
@@ -85,7 +85,7 @@ module storage './modules/storage/storage-account.bicep' = if (serviceName == 's
 
 
 /////Networking Module
-param vnetConfig object
+param vnetConfig object = {}
 
 
 module vnetModule './modules/networking/vnet.bicep' = if (serviceName == 'network') {
