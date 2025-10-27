@@ -4,7 +4,14 @@ param tagSuffix string
 param clusterName string
 
 resource nodepool 'Microsoft.ContainerService/managedClusters/agentPools@2025-01-01' = {
-  name: '${clusterName}/${pool.name}' // child resource of cluster
+  name: '${clusterName}/${pool.name}'
+  dependsOn: [
+    resourceId('Microsoft.ContainerService/managedClusters', clusterName)
+  ]
+  tags: {
+    environment: tagSuffix
+    poolName: pool.name
+  }
   properties: {
     vmSize: pool.vmSize
     count: pool.count
