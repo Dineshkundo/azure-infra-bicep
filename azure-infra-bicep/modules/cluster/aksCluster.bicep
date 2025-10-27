@@ -11,15 +11,13 @@ param kubernetesVersion string
 param authorizedIpRanges array
 param tagSuffix string
 
-// -----------------------------
-// AKS Cluster Resource
-// -----------------------------
 resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
   name: clusterName
   location: location
 
   tags: {
-    test: '${clusterName}-${tagSuffix}'
+    environment: tagSuffix
+    cluster: clusterName
   }
 
   identity: {
@@ -42,23 +40,13 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
       }
     }
 
-    // OIDC & workload identity
-    oidcIssuerProfile: {
-      enabled: true
-    }
+    oidcIssuerProfile: { enabled: true }
+    securityProfile: { workloadIdentity: { enabled: true } }
 
-    securityProfile: {
-      workloadIdentity: {
-        enabled: true
-      }
-    }
-
-    // API server access (authorized IPs)
     apiServerAccessProfile: {
       authorizedIPRanges: authorizedIpRanges
     }
 
-    // Network
     networkProfile: {
       networkPlugin: 'azure'
       networkPolicy: 'azure'
@@ -68,7 +56,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
       outboundType: 'loadBalancer'
     }
 
-    // System node pool defined inline
     agentPoolProfiles: [
       {
         name: systemPool.name
@@ -95,10 +82,7 @@ module userNodePools './nodePool.bicep' = [for pool in userPools: {
   params: {
     pool: pool
     vnetResourceId: vnetResourceId
-    tagSuffix: tagSuffix
     clusterName: clusterName
   }
-  dependsOn: [
-    aks  // ensures AKS cluster and system pool are ready before user pools deploy
-  ]
+  dependsOn: [ aks ]
 }]

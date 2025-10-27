@@ -190,9 +190,10 @@ param serviceCidr string
 param dnsServiceIP string
 param kubernetesVersion string
 param authorizedIpRanges array
+param tagSuffix string
 
 module aks './modules/cluster/aksCluster.bicep' = {
-  name: '${clusterName}'
+  name: clusterName
   params: {
     location: location
     clusterName: clusterName
@@ -208,6 +209,7 @@ module aks './modules/cluster/aksCluster.bicep' = {
     tagSuffix: tagSuffix
   }
 }
+
 
 
 // // module sql './modules/data-factory/sql.bicep' = {
