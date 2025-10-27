@@ -1,6 +1,5 @@
 param pool object
 param vnetResourceId string
-param tagSuffix string
 param clusterName string
 
 resource nodepool 'Microsoft.ContainerService/managedClusters/agentPools@2025-01-01' = {
@@ -8,10 +7,6 @@ resource nodepool 'Microsoft.ContainerService/managedClusters/agentPools@2025-01
   dependsOn: [
     resourceId('Microsoft.ContainerService/managedClusters', clusterName)
   ]
-  tags: {
-    environment: tagSuffix
-    poolName: pool.name
-  }
   properties: {
     vmSize: pool.vmSize
     count: pool.count
