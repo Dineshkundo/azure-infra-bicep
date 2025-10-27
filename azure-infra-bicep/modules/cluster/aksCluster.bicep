@@ -90,7 +90,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
 // -----------------------------
 // User Node Pools
 // -----------------------------
-module userNodePools './modules/cluster/nodePool.bicep' = [for pool in userPools: {
+module userNodePools './nodePool.bicep' = [for pool in userPools: {
   name: '${clusterName}-${pool.name}'
   params: {
     pool: pool

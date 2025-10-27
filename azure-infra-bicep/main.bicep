@@ -191,9 +191,6 @@ param dnsServiceIP string
 param kubernetesVersion string
 param authorizedIpRanges array
 
-@description('Suffix appended to every resource tag value')
-param tagSuffix string
-
 module aks './modules/cluster/aksCluster.bicep' = {
   name: '${clusterName}'
   params: {
