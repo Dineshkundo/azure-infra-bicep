@@ -180,18 +180,38 @@ module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for 
 
 
 
-// //// AKS and SQL Modules
-// // module aks './modules/cluster/aks.bicep' = {
-// //   name: 'deployAKS'
-// //   params: {
-// //     clusterName: aksConfig.clusterName
-// //     nodeCount: aksConfig.nodeCount
-// //     nodeSize: aksConfig.nodeSize
-// //     servicePrincipalSecretName: aksConfig.servicePrincipalSecretName
-// //     keyVaultName: keyVaultConfig.keyVaultName
-// //     location: location
-// //   }
-// // }
+param clusterName string
+param vnetResourceId string
+param sshPublicKey string
+param adminUsername string
+param systemPool object
+param userPools array
+param serviceCidr string
+param dnsServiceIP string
+param kubernetesVersion string
+param authorizedIpRanges array
+
+@description('Suffix appended to every resource tag value')
+param tagSuffix string
+
+module aks './modules/cluster/aksCluster.bicep' = {
+  name: '${clusterName}'
+  params: {
+    location: location
+    clusterName: clusterName
+    vnetResourceId: vnetResourceId
+    sshPublicKey: sshPublicKey
+    adminUsername: adminUsername
+    systemPool: systemPool
+    userPools: userPools
+    serviceCidr: serviceCidr
+    dnsServiceIP: dnsServiceIP
+    kubernetesVersion: kubernetesVersion
+    authorizedIpRanges: authorizedIpRanges
+    tagSuffix: tagSuffix
+  }
+}
+
 
 // // module sql './modules/data-factory/sql.bicep' = {
 // //   name: 'deploySQL'

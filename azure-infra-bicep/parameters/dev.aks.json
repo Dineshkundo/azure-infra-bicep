@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { "value": "eastus" },
+    "clusterName": { "value": "coda-testaks" },
+    "vnetResourceId": { "value": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/coda_rg/providers/Microsoft.Network/virtualNetworks/DevVnet" },
+    "sshPublicKey": { "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC1hJ7Bf3F3P2aWDtMa7CBmkDxAehxYDrdf/8AzXjaXPbHPZDa6r3tgOaparIP7qg6IMh6Ae6BHG6V5NRkYHjv99HlM/GQGvFfzYLckAsjcy2ZgzXPfK2kKVcz+QnBzXE00q4NpKww84J/MYR1m8/l66siH9S+SG0TvQ1WJ8pz0DJwbMQR6/Ufd3wQfe4N2p9sOFSo2XnIivLS9o5onuUKNs49VFYbsdMBIXDHcJ6sxi3WioAlbI9h0USsqlWdBr41ZPIQBgQhcfiVLj2Ehd335OCixO4SRE+1nbPqaKNZNmohgegWG+PYrcQEPDuwOE3VudAnsx6xXEJob6DpmozIRGf+yiiIJWZ+mXqpQV4mlZ3M8lo/bu/hJ91i/UKwOdK1jGKTzbe3+peHHMKY40hxTpaIWEuezI6dYMuhP0uExfuV0lcKJE5/IUOL2IPzpqP83q/41VBTLQaWBAyxYUnNrl4pajost73FkzAII08uPmAqyVlz9hOJn/U6IrQhctotJY6M2l5bV92DS7g46jh9V1HgzsJUnETbHtJcsUduj/Fdes+DNx2HTZpll74o+KzcSHxXTTHUWVGWjrn1Smn1EQa5Xr9bMnB0DC8S1VzsSyDQbo1/NxwGFFM9KKksKS1WkIRCuRYOM9+eHQaXhM/EfdIT3AyKBaow0Sfl9SaD7kw== test-aks-cluster" },
+    "adminUsername": { "value": "aksadmin" },
+
+    "serviceCidr": { "value": "10.240.0.0/24" },
+    "dnsServiceIP": { "value": "10.240.0.10" },
+
+    "kubernetesVersion": { "value": "1.31.1" },
+
+    "authorizedIpRanges": {
+      "value": [
+        "38.79.64.66/32",
+        "172.208.97.243/32"
+      ]
+    },
+
+    "systemPool": {
+      "value": {
+        "name": "systempool",
+        "vmSize": "Standard_B4ms",
+        "count": 1,
+        "minCount": 1,
+        "maxCount": 1,
+        "subnetName": "subnet3",
+        "maxPods": 50,
+        "mode": "System"
+      }
+    },
+
+    "userPools": {
+      "value": [
+        {
+          "name": "userpool1",
+          "vmSize": "Standard_B4ms",
+          "count": 1,
+          "minCount": 1,
+          "maxCount": 2,
+          "subnetName": "subnet3",
+          "maxPods": 50,
+          "mode": "User"
+        }
+      ]
+    },
+
+    "tagSuffix": { "value": "test" }
+  }
+}
