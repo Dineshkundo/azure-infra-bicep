@@ -177,9 +177,11 @@ module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for 
 }]
 
 
+//////////////////////////Cluster///////////////
 
 
 
+param location string
 param clusterName string
 param vnetResourceId string
 param sshPublicKey string
@@ -190,10 +192,12 @@ param serviceCidr string
 param dnsServiceIP string
 param kubernetesVersion string
 param authorizedIpRanges array
+
+@description('Suffix appended to every resource tag value')
 param tagSuffix string
 
 module aks './modules/cluster/aksCluster.bicep' = {
-  name: clusterName
+  name: '${clusterName}'
   params: {
     location: location
     clusterName: clusterName
@@ -209,6 +213,7 @@ module aks './modules/cluster/aksCluster.bicep' = {
     tagSuffix: tagSuffix
   }
 }
+
 
 
 

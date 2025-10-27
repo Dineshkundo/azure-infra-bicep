@@ -11,6 +11,9 @@ param kubernetesVersion string
 param authorizedIpRanges array
 param tagSuffix string
 
+// -----------------------------
+// AKS Cluster Resource
+// -----------------------------
 resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
   name: clusterName
   location: location
@@ -27,7 +30,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
   properties: {
     kubernetesVersion: kubernetesVersion
     dnsPrefix: clusterName
-
     enableRBAC: true
     disableLocalAccounts: false
 
@@ -40,8 +42,15 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
       }
     }
 
-    oidcIssuerProfile: { enabled: true }
-    securityProfile: { workloadIdentity: { enabled: true } }
+    oidcIssuerProfile: {
+      enabled: true
+    }
+
+    securityProfile: {
+      workloadIdentity: {
+        enabled: true
+      }
+    }
 
     apiServerAccessProfile: {
       authorizedIPRanges: authorizedIpRanges
@@ -82,7 +91,10 @@ module userNodePools './nodePool.bicep' = [for pool in userPools: {
   params: {
     pool: pool
     vnetResourceId: vnetResourceId
+    tagSuffix: tagSuffix
     clusterName: clusterName
   }
-  dependsOn: [ aks ]
+  dependsOn: [
+    aks
+  ]
 }]
