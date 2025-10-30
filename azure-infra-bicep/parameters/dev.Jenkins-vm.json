@@ -4,6 +4,7 @@
   "parameters": {
     "serviceName": { "value": "Jenkins-vm" },
     "tagSuffix": { "value": "dev" },
+    "location": { "value": "eastus" },
     "vmConfig": {
       "value": {
         "vmName": "jenkins-vm01",
