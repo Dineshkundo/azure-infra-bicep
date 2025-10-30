@@ -194,7 +194,7 @@ param authorizedIpRanges array
 
 
 module aks './modules/cluster/aksCluster.bicep' = {
-  name: '${clusterName}'
+  name: clusterName
   params: {
     location: location
     clusterName: clusterName
