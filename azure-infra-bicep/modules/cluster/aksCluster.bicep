@@ -1,26 +1,14 @@
 param location string
-param clusterName string
-param vnetResourceId string
-param sshPublicKey string
-param adminUsername string
-param systemPool object
-param userPools array
-param serviceCidr string
-param dnsServiceIP string
-param kubernetesVersion string
-param authorizedIpRanges array
+param aksConfig object
 param tagSuffix string
 
-// -----------------------------
-// AKS Cluster Resource
-// -----------------------------
 resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
-  name: clusterName
+  name: aksConfig.clusterName
   location: location
 
   tags: {
     environment: tagSuffix
-    cluster: clusterName
+    cluster: aksConfig.clusterName
   }
 
   identity: {
@@ -28,16 +16,16 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
   }
 
   properties: {
-    kubernetesVersion: kubernetesVersion
-    dnsPrefix: clusterName
+    kubernetesVersion: aksConfig.kubernetesVersion
+    dnsPrefix: aksConfig.clusterName
     enableRBAC: true
     disableLocalAccounts: false
 
     linuxProfile: {
-      adminUsername: adminUsername
+      adminUsername: aksConfig.adminUsername
       ssh: {
         publicKeys: [
-          { keyData: sshPublicKey }
+          { keyData: aksConfig.sshPublicKey }
         ]
       }
     }
@@ -53,46 +41,43 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-01-01' = {
     }
 
     apiServerAccessProfile: {
-      authorizedIPRanges: authorizedIpRanges
+      authorizedIPRanges: aksConfig.authorizedIpRanges
     }
 
     networkProfile: {
       networkPlugin: 'azure'
       networkPolicy: 'azure'
       loadBalancerSku: 'Standard'
-      serviceCidr: serviceCidr
-      dnsServiceIP: dnsServiceIP
+      serviceCidr: aksConfig.serviceCidr
+      dnsServiceIP: aksConfig.dnsServiceIP
       outboundType: 'loadBalancer'
     }
 
     agentPoolProfiles: [
       {
-        name: systemPool.name
-        vmSize: systemPool.vmSize
-        count: systemPool.count
-        minCount: systemPool.minCount
-        maxCount: systemPool.maxCount
+        name: aksConfig.systemPool.name
+        vmSize: aksConfig.systemPool.vmSize
+        count: aksConfig.systemPool.count
+        minCount: aksConfig.systemPool.minCount
+        maxCount: aksConfig.systemPool.maxCount
         enableAutoScaling: true
-        mode: systemPool.mode
+        mode: aksConfig.systemPool.mode
         osType: 'Linux'
         osSKU: 'Ubuntu'
-        vnetSubnetID: '${vnetResourceId}/subnets/${systemPool.subnetName}'
-        maxPods: systemPool.maxPods
+        vnetSubnetID: '${aksConfig.vnetResourceId}/subnets/${aksConfig.systemPool.subnetName}'
+        maxPods: aksConfig.systemPool.maxPods
       }
     ]
   }
 }
 
-// -----------------------------
-// User Node Pools
-// -----------------------------
-module userNodePools './nodePool.bicep' = [for pool in userPools: {
-  name: '${clusterName}-${pool.name}'
+module userNodePools './nodePool.bicep' = [for pool in aksConfig.userPools: {
+  name: '${aksConfig.clusterName}-${pool.name}'
   params: {
     pool: pool
-    vnetResourceId: vnetResourceId
+    vnetResourceId: aksConfig.vnetResourceId
     tagSuffix: tagSuffix
-    clusterName: clusterName
+    clusterName: aksConfig.clusterName
   }
   dependsOn: [
     aks

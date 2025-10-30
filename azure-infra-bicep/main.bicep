@@ -181,31 +181,14 @@ module RedhatServerUAT './modules/virtual-machine/RedhatServerUAT.bicep' = [for 
 
 
 
-param clusterName string
-param vnetResourceId string
-param sshPublicKey string
-param adminUsername string
-param systemPool object
-param userPools array
-param serviceCidr string
-param dnsServiceIP string
-param kubernetesVersion string
-param authorizedIpRanges array
+@description('AKS cluster configuration')
+param aksConfig object = {}
 
 module aks './modules/cluster/aksCluster.bicep' = if (serviceName == 'aks') {
-  name: clusterName
+  name: aksConfig.clusterName
   params: {
     location: location
-    clusterName: clusterName
-    vnetResourceId: vnetResourceId
-    sshPublicKey: sshPublicKey
-    adminUsername: adminUsername
-    systemPool: systemPool
-    userPools: userPools
-    serviceCidr: serviceCidr
-    dnsServiceIP: dnsServiceIP
-    kubernetesVersion: kubernetesVersion
-    authorizedIpRanges: authorizedIpRanges
+    aksConfig: aksConfig
     tagSuffix: tagSuffix
   }
 }
