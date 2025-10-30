@@ -117,9 +117,9 @@ module Matching_Service './modules/virtual-machine/Matching_Service.bicep' = [fo
 
 //
 
-// ///////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////
 // Deploy Matching Service QA Backup VMs from configuration array  ////
-// ///////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////
 
 
 var vmsToDeployQA = serviceName == 'Matching-Service-QA-Backup' ? vms : []
@@ -161,7 +161,7 @@ module vmRHELDevQa './modules/virtual-machine/RHELDevQa.bicep' = [for vm in vmsT
 }]
 
 ////////////////////////////////////////////////////////////////////
-///// RedhatServerUAT ///
+// RedhatServerUAT ///
 ///////////////////////////////////////////////////////////////////          
 
 
@@ -192,8 +192,7 @@ param dnsServiceIP string
 param kubernetesVersion string
 param authorizedIpRanges array
 
-
-module aks './modules/cluster/aksCluster.bicep' = {
+module aks './modules/cluster/aksCluster.bicep' = if (serviceName == 'aks') {
   name: clusterName
   params: {
     location: location
