@@ -22,7 +22,7 @@ var sshPublicKey = listSecret(resourceId('Microsoft.KeyVault/vaults/secrets', ke
 // ==========================
 // Compute subnetId dynamically
 // ==========================
-var subnetId = resourceId('Microsoft.Network/virtualNetworks/subnets', vmConfig.vnetName, vmConfig.subnetName)
+//var subnetId = resourceId('Microsoft.Network/virtualNetworks/subnets', vmConfig.vnetName, vmConfig.subnetName)
 
 // ==========================
 // NIC resource
@@ -103,5 +103,4 @@ output vmSize string = vm.properties.hardwareProfile.vmSize
 output osDiskType string = vm.properties.storageProfile.osDisk.managedDisk.storageAccountType
 output osDiskSizeGB int = vm.properties.storageProfile.osDisk.diskSizeGB
 output imageReference object = vm.properties.storageProfile.imageReference
-output subnetId string = subnetId
 output privateIP string = nic.properties.ipConfigurations[0].properties.privateIPAddress
