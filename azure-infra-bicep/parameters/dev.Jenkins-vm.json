@@ -2,12 +2,18 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "serviceName": { "value": "Jenkins-vm" },
-    "tagSuffix": { "value": "dev" },
-    "location": { "value": "eastus" },
+    "serviceName": {
+      "value": "Jenkins-vm"
+    },
+    "tagSuffix": {
+      "value": "dev"
+    },
+    "location": {
+      "value": "eastus"
+    },
     "vmConfig": {
       "value": {
-        "vmName": "Test-server",
+        "vmName": "jenkins-dev-vm",
         "location": "eastus",
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
@@ -19,10 +25,10 @@
         "deleteOption": "Delete",
         "imageReference": {
           "publisher": "Canonical",
-          "offer": "UbuntuServer",
-          "sku": "18_04-lts-gen2",
+          "offer": "0001-com-ubuntu-server-focal",
+          "sku": "20_04-lts-gen2",
           "version": "latest"
-        }      
+        }
       }
     }
   }

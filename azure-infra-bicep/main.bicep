@@ -36,14 +36,22 @@ param serviceName string
 // Service-specific configurations
 param vmConfig object = {}
 param storageConfig object = {}
+@description('Deployment location (e.g., eastus)')
+param location string
 
 // Tag suffix
 @description('Suffix for tags')
 param tagSuffix string
 
 
+// ----------------------------------------
+// ✅ Reference existing Key Vault
+// ----------------------------------------
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: 'CODADEV'
+}
 
-/////////////////////// Key Vault Module  /////
+// /////////////////////// Key Vault Module  /////
 
 var vmsToDeployKV = serviceName == 'keyvault' ? vms : []
 module kv './modules/security/keyvault.bicep' = [for secrets in vmsToDeployKV: {
@@ -65,6 +73,7 @@ module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'Jenkin
   params: {
     vmConfig: vmConfig
     tagSuffix: tagSuffix
+    keyVaultName: keyVault.name
   }
 }
 
@@ -99,7 +108,6 @@ module vnetModule './modules/networking/vnet.bicep' = if (serviceName == 'networ
 ///
 
 param vms array = []
-param location string
 
 var vmsToDeploy = serviceName == 'Matching-Service' ? vms : []
 
