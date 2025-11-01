@@ -11,7 +11,7 @@
         "location": "eastus",
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
-        "subnetName": "subnet1",
+        "subnetName": "subnet3",
         "adminUsername": "azureuser",
         "osType": "Linux",
         "osDiskType": "Standard_LRS",
@@ -23,7 +23,7 @@
           "sku": "22_04-lts",
           "version": "latest"
         },
-        "subnetId": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/CODA_RG/providers/Microsoft.Network/virtualNetworks/DevVnet/subnets/Subnet1"
+        "subnetId": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/CODA_RG/providers/Microsoft.Network/virtualNetworks/DevVnet/subnets/subnet3"
       }
     }
   }
