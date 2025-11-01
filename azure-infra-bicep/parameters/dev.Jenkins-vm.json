@@ -18,10 +18,10 @@
         "osDiskSizeGB": 30,
         "deleteOption": "Delete",
         "imageReference": {
-          "publisher": "canonical",
-          "offer": "ubuntu-24_04-lts",
-          "sku": "server",
-          "version": "latest"
+          "publisher": "Canonical",
+          "offer": "UbuntuServer",
+          "sku": "18.04-LTS",
+          "version": "18.04.202401161"
         }      
       }
     }
