@@ -12,17 +12,15 @@
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
         "subnetName": "subnet1",
+        "adminUsername": "azureuser",
+        "osDiskType": "Standard_LRS",
+        "osDiskSizeGB": 30,
         "imageReference": {
           "publisher": "Canonical",
           "offer": "0001-com-ubuntu-server-jammy",
           "sku": "22_04-lts",
           "version": "latest"
         }
-      }
-    },
-    "secrets": {
-      "value": {
-        "adminUsername": "azureuser"
       }
     }
   }

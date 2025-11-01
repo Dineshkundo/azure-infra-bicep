@@ -4,12 +4,20 @@ targetScope = 'resourceGroup'
 // Parameters
 // ==========================
 param vmConfig object
-@secure()
-param secrets object
+
 
 @description('Tag suffix for resource tagging')
 param tagSuffix string
 
+// -----------------------------------------------------------
+// ✅ Reference your existing Key Vault (CODADEV)
+// -----------------------------------------------------------
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: 'CODADEV'
+}
+
+// ✅ Retrieve SSH Public Key only (for VM creation)
+var sshPublicKey = reference('${keyVault.id}/secrets/sshPublicKey', '2023-07-01').value
 // ==========================
 // Compute subnetId dynamically
 // ==========================
@@ -67,12 +75,12 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     }
     osProfile: {
       computerName: vmConfig.vmName
-      adminUsername: secrets.adminUsername
+      adminUsername: vmConfig.adminUsername
       linuxConfiguration: {
         disablePasswordAuthentication: true
         ssh: {
           publicKeys: [
-            { path: '/home/${secrets.adminUsername}/.ssh/authorized_keys', keyData: secrets.sshPublicKey }
+            { path: '/home/${vmConfig.adminUsername}/.ssh/authorized_keys', keyData: sshPublicKey }
           ]
         }
       }
@@ -81,28 +89,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   }
 }
 
-// ==========================
-// VM Access Extension (Optional)
-// ==========================
-resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if (!empty(secrets.extensions_username)) {
-  parent: vm
-  name: 'enablevmAccess'
-  location: vmConfig.location
-  properties: {
-    autoUpgradeMinorVersion: true
-    publisher: 'Microsoft.OSTCExtensions'
-    type: 'VMAccessForLinux'
-    typeHandlerVersion: '1.5'
-    settings: {}
-    protectedSettings: {
-      username: secrets.extensions_username
-      ssh_key: secrets.extensions_ssh_key
-      reset_ssh: secrets.extensions_reset_ssh
-      remove_user: secrets.extensions_remove_user
-      expiration: secrets.extensions_expiration
-    }
-  }
-}
 
 // ==========================
 // Outputs

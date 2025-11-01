@@ -42,16 +42,6 @@ param storageConfig object = {}
 param tagSuffix string
 
 
-// -----------------------------------------------------------
-// ✅ Reference your existing Key Vault (CODADEV)
-// -----------------------------------------------------------
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: 'CODADEV'
-}
-
-// ✅ Retrieve SSH Public Key only (for VM creation)
-var sshPublicKey = reference('${keyVault.id}/secrets/sshPublicKey', '2023-07-01').value
-
 
 /////////////////////// Key Vault Module  /////
 
@@ -74,10 +64,6 @@ module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'Jenkin
   name: 'deployVM'
   params: {
     vmConfig: vmConfig
-    secrets: {
-      adminUsername: 'azureuser'      // or pull from parameter if you have one
-      sshPublicKey: sshPublicKey      // 👈 inject only public key here
-    }
     tagSuffix: tagSuffix
   }
 }
