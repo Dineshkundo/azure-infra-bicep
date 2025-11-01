@@ -8,7 +8,7 @@
     "vmConfig": {
       "value": {
         "vmName": "iac-test-vm",
-        "location": "eastus",
+        "location": "eastus2",
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
         "subnetName": "subnet3",
@@ -20,8 +20,8 @@
         "imageReference": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "18.04-LTS",
-          "version": "18.04.202401161"
+          "sku": "18_04-lts-gen2",
+          "version": "latest"
         }      
       }
     }
