@@ -11,13 +11,14 @@ param tagSuffix string
 
 // -----------------------------------------------------------
 // ✅ Reference your existing Key Vault (CODADEV)
-// -----------------------------------------------------------
+// Reference existing Key Vault
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: 'CODADEV'
 }
 
-// ✅ Retrieve SSH Public Key only (for VM creation)
-var sshPublicKey = reference('${keyVault.id}/secrets/sshPublicKey', '2023-07-01').value
+// Retrieve SSH public key
+var sshPublicKey = listSecret('sshPublicKey', keyVault.id).value
+
 // ==========================
 // Compute subnetId dynamically
 // ==========================
