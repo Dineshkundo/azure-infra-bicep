@@ -73,7 +73,7 @@ module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'Jenkin
   params: {
     vmConfig: vmConfig
     tagSuffix: tagSuffix
-    keyVaultName: keyVault.name
+    sshPublicKey: vmConfig.sshPublicKey
   }
 }
 

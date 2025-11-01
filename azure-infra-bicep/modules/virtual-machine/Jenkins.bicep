@@ -5,14 +5,14 @@ param vmConfig object
 
 @description('Tag suffix for tagging')
 param tagSuffix string
+@description('SSH public key for VM login')
+param sshPublicKey string
 
-@description('Existing Key Vault name')
-param keyVaultName string
 
-// ----------------------------------------
-// Get SSH key from Key Vault
-// ----------------------------------------
-var sshPublicKey = listSecret(resourceId('Microsoft.KeyVault/vaults/secrets', keyVaultName, 'sshPublicKey'), '2019-09-01').value
+// // ----------------------------------------
+// // Get SSH key from Key Vault
+// // ----------------------------------------
+// var sshPublicKey = listSecret(resourceId('Microsoft.KeyVault/vaults/secrets', keyVaultName, 'sshPublicKey'), '2019-09-01').value
 
 // ----------------------------------------
 // Reference existing subnet in existing VNet
