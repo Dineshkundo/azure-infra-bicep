@@ -8,7 +8,7 @@
     "vmConfig": {
       "value": {
         "vmName": "iac-test-vm-eastus2",
-        "location": "eastus2",
+        "location": "eastus",
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
         "subnetName": "subnet3",
