@@ -22,7 +22,7 @@ var sshPublicKey = listSecret(resourceId('Microsoft.KeyVault/vaults/secrets', ke
 // ==========================
 // Compute subnetId dynamically
 // ==========================
-//var subnetId = resourceId('Microsoft.Network/virtualNetworks/subnets', vmConfig.vnetName, vmConfig.subnetName)
+var subnetId = resourceId('Microsoft.Network/virtualNetworks/subnets', vmConfig.vnetName, vmConfig.subnetName)
 
 // ==========================
 // NIC resource
@@ -39,7 +39,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
       {
         name: 'ipconfig1'
         properties: {
-          subnet: { id: vmConfig.subnetId }
+          subnet: { id: subnetId }
           privateIPAllocationMethod: 'Dynamic'
         }
       }
