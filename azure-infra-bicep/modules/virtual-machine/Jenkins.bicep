@@ -118,3 +118,4 @@ output osDiskType string = vm.properties.storageProfile.osDisk.managedDisk.stora
 output osDiskSizeGB int = vm.properties.storageProfile.osDisk.diskSizeGB
 output imageReference object = vm.properties.storageProfile.imageReference
 output subnetId string = subnetId
+output privateIP string = nic.properties.ipConfigurations[0].properties.privateIPAddress

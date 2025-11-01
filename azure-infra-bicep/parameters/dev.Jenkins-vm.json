@@ -7,7 +7,7 @@
     "location": { "value": "eastus" },
     "vmConfig": {
       "value": {
-        "vmName": "jenkins-vm01",
+        "vmName": "iac-test-vm",
         "location": "eastus",
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
@@ -17,20 +17,12 @@
           "offer": "0001-com-ubuntu-server-jammy",
           "sku": "22_04-lts",
           "version": "latest"
-        },
-        "osDiskType": "Premium_LRS",
-        "osDiskSizeGB": 64
+        }
       }
     },
     "secrets": {
       "value": {
-        "adminUsername": "azureuser",
-        "sshPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu",
-        "extensions_username": "jenkinsadmin",
-        "extensions_ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD",
-        "extensions_reset_ssh": true,
-        "extensions_remove_user": false,
-        "extensions_expiration": "2026-12-31T23:59:59Z"
+        "adminUsername": "azureuser"
       }
     }
   }
