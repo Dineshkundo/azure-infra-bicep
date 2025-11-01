@@ -16,6 +16,7 @@
         "osType": "Linux",
         "osDiskType": "Standard_LRS",
         "osDiskSizeGB": 30,
+        "deleteOption": "Delete",
         "imageReference": {
           "publisher": "Canonical",
           "offer": "0001-com-ubuntu-server-jammy",

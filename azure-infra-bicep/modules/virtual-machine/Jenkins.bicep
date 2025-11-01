@@ -69,6 +69,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
         caching: 'ReadWrite'
         managedDisk: { storageAccountType: vmConfig.osDiskType }
         diskSizeGB: vmConfig.osDiskSizeGB
+        deleteOption: vmConfig.deleteOption
       }
     }
     osProfile: {
