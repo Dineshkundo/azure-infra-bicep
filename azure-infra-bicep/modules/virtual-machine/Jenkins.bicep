@@ -31,7 +31,6 @@ resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   location: vmConfig.location
   tags: {
     environment: tagSuffix
-    project: 'VM'
     createdBy: 'iac-bicep'
   }
   properties: {
@@ -39,7 +38,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
       {
         name: 'ipconfig1'
         properties: {
-          subnet: { id: subnetId }
+          subnet: { id: vmConfig.subnetId }
           privateIPAllocationMethod: 'Dynamic'
         }
       }
@@ -58,7 +57,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   identity: { type: 'SystemAssigned' }
   tags: {
     environment: tagSuffix
-    project: 'VM'
     createdBy: 'iac-bicep'
   }
   properties: {
@@ -66,7 +64,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     storageProfile: {
       imageReference: vmConfig.imageReference
       osDisk: {
-        osType: 'Linux'
+        osType: vmConfig.osType
         createOption: 'FromImage'
         caching: 'ReadWrite'
         managedDisk: { storageAccountType: vmConfig.osDiskType }

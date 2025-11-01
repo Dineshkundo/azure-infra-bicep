@@ -13,6 +13,7 @@
         "vnetName": "DevVnet",
         "subnetName": "subnet1",
         "adminUsername": "azureuser",
+        "osType": "Linux",
         "osDiskType": "Standard_LRS",
         "osDiskSizeGB": 30,
         "imageReference": {
@@ -20,7 +21,8 @@
           "offer": "0001-com-ubuntu-server-jammy",
           "sku": "22_04-lts",
           "version": "latest"
-        }
+        },
+        "subnetId": "/subscriptions/d629b553-466f-4caa-b64b-9ba2bae97c3f/resourceGroups/CODA_RG/providers/Microsoft.Network/virtualNetworks/DevVnet/subnets/Subnet1"
       }
     }
   }
