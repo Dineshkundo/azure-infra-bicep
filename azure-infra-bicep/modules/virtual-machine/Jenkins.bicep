@@ -17,7 +17,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 }
 
 // Retrieve SSH public key
-var sshPublicKey = listSecret('sshPublicKey', keyVault.id).value
+var sshPublicKey = listSecret(resourceId('Microsoft.KeyVault/vaults/secrets', keyVault.name, 'sshPublicKey'), '2019-09-01').value
 
 // ==========================
 // Compute subnetId dynamically
