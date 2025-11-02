@@ -8,6 +8,9 @@
     "tagSuffix": {
       "value": "dev"
     },
+    "createdBy": {
+      "value": "iac-bicep"
+    },
     "location": {
       "value": "eastus"
     },

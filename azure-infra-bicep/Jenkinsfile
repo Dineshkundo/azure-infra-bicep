@@ -1,101 +1,243 @@
+@Library('shared-lib') _
+
 pipeline {
     agent any
 
-    environment {
-        AZURE_SUBSCRIPTION_ID = '<your-subscription-id>'
-        AZURE_CREDENTIALS = 'azure-service-principal'  // Jenkins credential ID
-        RESOURCE_GROUP = 'rg-${ENVIRONMENT}'
-        LOCATION = 'eastus'
+    options {
+        buildDiscarder(logRotator(daysToKeepStr: '60'))
+        timeout(time: 60, unit: 'MINUTES')
+        ansiColor('xterm')
+        disableConcurrentBuilds()
     }
 
     parameters {
-        string(name: 'ENVIRONMENT', defaultValue: 'dev', description: 'Environment: dev/uat/prod')
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'prod'],
+            description: 'Select the target environment'
+        )
+        choice(
+            name: 'SERVICE_NAME',
+            choices: [
+                'Jenkins-vm',
+                'Matching-Service',
+                'Matching-Service-QA-Backup',
+                'Boomi_Integration',
+                'RHELDevQa',
+                'RedhatServerUAT',
+                'keyvault',
+                'storage',
+                'network',
+                'aks'
+            ],
+            description: 'Select the service to deploy'
+        )
+        booleanParam(
+            name: 'DEPLOY',
+            defaultValue: false,
+            description: 'Run actual deployment (skip = What-If only)?'
+        )
+        booleanParam(
+            name: 'DESTROY',
+            defaultValue: false,
+            description: 'Destroy the selected infrastructure? (irreversible)'
+        )
+    }
+
+    environment {
+        AZURE_DEV_RG  = "CODA_RG"
+        AZURE_PROD_RG = "CODA-PROD-RG"
     }
 
     stages {
 
-        stage('Login to Azure') {
+        stage('Init') {
             steps {
-                echo "Logging into Azure..."
-                withCredentials([azureServicePrincipal(credentialsId: "${AZURE_CREDENTIALS}", subscriptionIdVariable: 'SUBSCRIPTION_ID', clientIdVariable: 'CLIENT_ID', clientSecretVariable: 'CLIENT_SECRET', tenantIdVariable: 'TENANT_ID')]) {
+                script {
+                    wrap([$class: 'BuildUser']) {
+                        buildUser = env.BUILD_USER ?: 'Unknown'
+                    }
+
+                    echo "✅ Initialized by ${buildUser}"
+                    echo "🌍 Environment: ${params.ENVIRONMENT}"
+                    echo "⚙️ Service: ${params.SERVICE_NAME}"
+
+                    // Securely set subscription and RG
+                    if (params.ENVIRONMENT == 'dev') {
+                        withCredentials([string(credentialsId: 'azure-dev-sub-id', variable: 'DEV_SUB')]) {
+                            env.SUBSCRIPTION_ID = DEV_SUB
+                            env.RESOURCE_GROUP  = env.AZURE_DEV_RG
+                        }
+                    } else {
+                        withCredentials([string(credentialsId: 'azure-prod-sub-id', variable: 'PROD_SUB')]) {
+                            env.SUBSCRIPTION_ID = PROD_SUB
+                            env.RESOURCE_GROUP  = env.AZURE_PROD_RG
+                        }
+                    }
+
+                    echo "🔗 Subscription and Resource Group configured securely."
+                }
+            }
+        }
+
+        stage('Checkout IaC Code') {
+            steps {
+                cleanWs()
+                script {
+                    echo "📦 Cloning IaC repo from Bitbucket..."
+                    git branch: 'main',
+                        // credentialsId: 'b8e7dce4-8ee0-4a83-b21f-a7f7ccfb20f2',
+                        url: "https://github.com/Dineshkundo/azure-infra-bicep.git"
+
+                    echo "✅ Repository cloned successfully."
+                }
+            }
+        }
+
+        stage('Azure Login') {
+            steps {
+                echo "🔑 Authenticating to Azure (Managed Identity)..."
+                withEnv(["AZURE_SUB=$SUBSCRIPTION_ID"]) {
                     sh '''
-                    az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT_ID
-                    az account set --subscription $SUBSCRIPTION_ID
+                        set +x
+                        az login --identity --output none
+                        az account set --subscription "$AZURE_SUB"
+                        set -x
                     '''
                 }
             }
         }
 
-        stage('Create Resource Group') {
+        stage('What-If Analysis') {
             steps {
-                echo "Creating Resource Group if not exists..."
-                sh """
-                az group create --name ${RESOURCE_GROUP} --location ${LOCATION}
-                """
+                script {
+                    def paramFile    = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${SERVICE_NAME}.json"
+                    def templateFile = "azure-infra-bicep/main.bicep"
+
+                    if (!fileExists(paramFile)) {
+                        error("❌ Parameter file not found: ${paramFile}")
+                    }
+
+                    echo "🔮 Running Azure What-If for ${params.SERVICE_NAME}..."
+                    sh """
+                        set +x
+                        az deployment group what-if \
+                          --resource-group "$RESOURCE_GROUP" \
+                          --template-file "${templateFile}" \
+                          --parameters @"${paramFile}" \
+                          --mode Incremental \
+                          --output table
+                        set -x
+                    """
+                }
             }
         }
 
-        stage('Deploy Key Vault & Secrets') {
+        stage('Confirm Deployment') {
+            when { expression { params.DEPLOY == true } }
             steps {
-                echo "Deploying Key Vault and secrets..."
-                sh """
-                az deployment group create \
-                    --resource-group ${RESOURCE_GROUP} \
-                    --template-file iac/modules/keyvault.bicep \
-                    --parameters @iac/variables/${ENVIRONMENT}.parameters.json
-                """
+                input message: "⚠️ You are about to deploy to '${params.ENVIRONMENT.toUpperCase()}' for service '${params.SERVICE_NAME}'. Confirm to proceed?"
             }
         }
 
-        stage('Deploy Networking') {
+        stage('Deploy Infrastructure') {
+            when { expression { params.DEPLOY == true } }
             steps {
-                echo "Deploying VNet and subnets..."
-                sh """
-                az deployment group create \
-                    --resource-group ${RESOURCE_GROUP} \
-                    --template-file iac/modules/network.bicep \
-                    --parameters @iac/variables/${ENVIRONMENT}.parameters.json
-                """
+                script {
+                    def paramFile    = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${SERVICE_NAME}.json"
+                    def templateFile = "azure-infra-bicep/main.bicep"
+                    
+                    // Fetch SSH key from Key Vault
+                    SSH_KEY = sh(
+                        script: "az keyvault secret show --vault-name CODADEV --name sshPublicKey --query value -o tsv",
+                        returnStdout: true
+                    ).trim()
+
+                    // Inject SSH key dynamically into vmConfig
+                    sh """
+                        jq --arg sshKey "$SSH_KEY" '.parameters.vmConfig.value.sshPublicKey = \$sshKey' \
+                        $paramFile > ${paramFile}.tmp && mv ${paramFile}.tmp $paramFile
+                    """
+
+                    echo "🔑 SSH key injected into parameters for deployment."
+                    echo "🚀 Deploying ${params.SERVICE_NAME} to ${params.ENVIRONMENT}..."
+                    sh """
+                        az deployment group create \
+                          --resource-group "$RESOURCE_GROUP" \
+                          --template-file "${templateFile}" \
+                          --parameters @"${paramFile}" \
+                          --mode Incremental \
+                          --only-show-errors 
+                    """
+                }
             }
         }
 
-        stage('Deploy VMs') {
+        stage('Confirm  Destruction') {
+            when { expression { params.DESTROY == true } }
             steps {
-                echo "Deploying Virtual Machines..."
-                sh """
-                az deployment group create \
-                    --resource-group ${RESOURCE_GROUP} \
-                    --template-file iac/main.bicep \
-                    --parameters @iac/variables/${ENVIRONMENT}.parameters.json
-                """
+                input message: "⚠️ You are about to DESTROY. Confirm to proceed?"
             }
         }
 
-        stage('Deploy Storage / AKS / Others') {
+        stage('Destroy Infrastructure') {
+            when { expression { params.DESTROY } }
             steps {
-                echo "Deploying Storage, AKS, and other resources..."
-                sh """
-                az deployment group create \
-                    --resource-group ${RESOURCE_GROUP} \
-                    --template-file iac/modules/storage.bicep \
-                    --parameters @iac/variables/${ENVIRONMENT}.parameters.json
-                """
-                sh """
-                az deployment group create \
-                    --resource-group ${RESOURCE_GROUP} \
-                    --template-file iac/modules/aks.bicep \
-                    --parameters @iac/variables/${ENVIRONMENT}.parameters.json
-                """
+                script {
+                    echo "💣 Preparing to destroy '${params.SERVICE_NAME}' (${params.ENVIRONMENT})..."
+
+                    // Define safety filters
+                    def envTag = params.ENVIRONMENT
+                    def svcTag = params.SERVICE_NAME
+
+                    // Step 1: Show all matching resources for review
+                    echo "🔍 Listing resources tagged with environment='${envTag}', serviceName='${svcTag}', createdBy='iac-bicep'"
+                    sh """
+                        az resource list --resource-group "$RESOURCE_GROUP" \
+                          --query "[?tags.environment=='${envTag}' && tags.serviceName=='${svcTag}' && tags.createdBy=='iac-bicep'].[name,type,location]" \
+                          -o table || true
+                    """
+
+                    // Step 2: Confirm only for prod
+                    if (envTag.toLowerCase() == "prod") {
+                        input message: "⚠️ PRODUCTION WARNING: Confirm deletion of all '${svcTag}' resources in '${envTag}'?"
+                    } else {
+                        echo "🟢 Auto-confirmed for non-prod environment (${envTag})."
+                    }
+
+                    // Step 3: Fetch resource IDs by tag
+                    def resourceIds = sh(
+                        script: """
+                            az resource list --resource-group "$RESOURCE_GROUP" \
+                              --query "[?tags.environment=='${envTag}' && tags.serviceName=='${svcTag}' && tags.createdBy=='iac-bicep'].id" \
+                              -o tsv
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    if (!resourceIds) {
+                        echo "✅ No matching tagged resources found — nothing to delete."
+                        return
+                    }
+
+                    // Step 4: Display & delete all matching resources
+                    echo "🔥 Deleting resources created by Bicep for ${svcTag}:"
+                    echo resourceIds
+
+                    sh """
+                        echo "${resourceIds}" | xargs -r -I {} az resource delete --ids {} --only-show-errors
+                    """
+
+                    echo "✅ All tagged resources for '${svcTag}' successfully deleted."
+                }
             }
         }
     }
 
     post {
-        success {
-            echo "Deployment completed successfully for ${ENVIRONMENT}"
-        }
-        failure {
-            echo "Deployment failed for ${ENVIRONMENT}"
+        always {
+            echo "🧹 Cleaning workspace..."
+            cleanWs()
         }
     }
 }

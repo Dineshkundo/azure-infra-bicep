@@ -9,9 +9,9 @@
 // // │   ├── aks.bicep                  # AKS cluster module
 // // │   └── others/                    # Any other resource modules
 // // ├── parameters/                     # Environment-specific parameter files
-// // │   ├── dev.parameters.json
-// // │   ├── uat.parameters.json
-// // │   ├── prod.parameters.json
+// // │   ├── dev.Jenkins-vm.json
+// // │   ├── uat.Jenkins-vm.json
+// // │   ├── prod.Jenkins-vm.json
 // // │   ├── dev.vm.variables.json      # Optional: separate VM variables if many VMs
 // // │   └── ...
 // // └── Jenkinsfile                    # CI/CD pipeline
@@ -42,6 +42,8 @@ param location string
 // Tag suffix
 @description('Suffix for tags')
 param tagSuffix string
+@description('Tag for the resource')
+param createdBy string
 
 
 // ----------------------------------------
@@ -73,6 +75,8 @@ module vm './modules/virtual-machine/Jenkins.bicep' = if (serviceName == 'Jenkin
   params: {
     vmConfig: vmConfig
     tagSuffix: tagSuffix
+    createdBy: createdBy
+    serviceName: serviceName
     sshPublicKey: vmConfig.sshPublicKey
   }
 }

@@ -3,8 +3,14 @@ targetScope = 'resourceGroup'
 @description('Jenkins VM configuration')
 param vmConfig object
 
+param serviceName string
+
+@description('Tag for the resource')
+param createdBy string
+
 @description('Tag suffix for tagging')
 param tagSuffix string
+
 @description('SSH public key for VM login')
 param sshPublicKey string
 
@@ -25,9 +31,10 @@ var subnetId = resourceId('Microsoft.Network/virtualNetworks/subnets', vmConfig.
 resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   name: '${vmConfig.vmName}-nic'
   location: vmConfig.location
-  tags: {
+  tags: {                        // Tags used to fetch and delete resources based on environment
     environment: tagSuffix
-    createdBy: 'iac-bicep'
+    createdBy: createdBy
+    serviceName: serviceName
   }
   properties: {
     ipConfigurations: [
@@ -51,9 +58,10 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  tags: {
+  tags: {                           // Tags used to fetch and delete resources based on environment
     environment: tagSuffix
-    createdBy: 'iac-bicep'
+    serviceName: serviceName
+    createdBy: createdBy
   }
   properties: {
     hardwareProfile: {
@@ -102,3 +110,4 @@ output vmId string = vm.id
 output vmName string = vm.name
 output privateIP string = nic.properties.ipConfigurations[0].properties.privateIPAddress
 output principalId string = vm.identity.principalId
+
