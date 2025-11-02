@@ -62,7 +62,7 @@ pipeline {
                     echo "🌍 Environment: ${params.ENVIRONMENT}"
                     echo "⚙️ Service: ${params.SERVICE_NAME}"
 
-                    // Securely set subscription and RG
+                    // Securely set subscription and resource group
                     if (params.ENVIRONMENT == 'dev') {
                         withCredentials([string(credentialsId: 'azure-dev-sub-id', variable: 'DEV_SUB')]) {
                             env.SUBSCRIPTION_ID = DEV_SUB
@@ -111,7 +111,7 @@ pipeline {
         stage('What-If Analysis') {
             steps {
                 script {
-                    def paramFile    = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${SERVICE_NAME}.json"
+                    def paramFile    = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${params.SERVICE_NAME}.json"
                     def templateFile = "azure-infra-bicep/main.bicep"
 
                     if (!fileExists(paramFile)) {
@@ -144,7 +144,7 @@ pipeline {
             when { expression { params.DEPLOY == true } }
             steps {
                 script {
-                    def paramFile    = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${SERVICE_NAME}.json"
+                    def paramFile    = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${params.SERVICE_NAME}.json"
                     def templateFile = "azure-infra-bicep/main.bicep"
                     
                     // Fetch SSH key from Key Vault
@@ -173,10 +173,10 @@ pipeline {
             }
         }
 
-        stage('Confirm  Destruction') {
+        stage('Confirm Destruction') {
             when { expression { params.DESTROY == true } }
             steps {
-                input message: "⚠️ You are about to DESTROY. Confirm to proceed?"
+                input message: "⚠️ You are about to DESTROY infrastructure. Confirm to proceed?"
             }
         }
 
@@ -186,30 +186,37 @@ pipeline {
                 script {
                     echo "💣 Preparing to destroy '${params.SERVICE_NAME}' (${params.ENVIRONMENT})..."
 
-                    // Define safety filters
-                    def envTag = params.ENVIRONMENT
-                    def svcTag = params.SERVICE_NAME
+                    def paramFile = "azure-infra-bicep/parameters/${params.ENVIRONMENT}.${params.SERVICE_NAME}.json"
+                    if (!fileExists(paramFile)) {
+                        error("❌ Parameter file not found: ${paramFile}")
+                    }
 
-                    // Step 1: Show all matching resources for review
-                    echo "🔍 Listing resources tagged with environment='${envTag}', serviceName='${svcTag}', createdBy='iac-bicep'"
+                    // Extract tag values
+                    def envTag      = sh(script: "jq -r '.parameters.tagSuffix.value' ${paramFile}", returnStdout: true).trim()
+                    def svcTag      = sh(script: "jq -r '.parameters.serviceName.value' ${paramFile}", returnStdout: true).trim()
+                    def createdByTag = sh(script: "jq -r '.parameters.createdBy.value' ${paramFile}", returnStdout: true).trim()
+
+                    echo "🔍 Using tags → environment='${envTag}', serviceName='${svcTag}', createdBy='${createdByTag}'"
+
+                    // Step 1: Show matching resources
                     sh """
                         az resource list --resource-group "$RESOURCE_GROUP" \
-                          --query "[?tags.environment=='${envTag}' && tags.serviceName=='${svcTag}' && tags.createdBy=='iac-bicep'].[name,type,location]" \
+                          --query "[?tags.environment=='${envTag}' && tags.serviceName=='${svcTag}' && tags.createdBy=='${createdByTag}'].[name,type,location]" \
                           -o table || true
                     """
 
-                    // Step 2: Confirm only for prod
+                    // Step 2: Confirm deletion for prod
                     if (envTag.toLowerCase() == "prod") {
                         input message: "⚠️ PRODUCTION WARNING: Confirm deletion of all '${svcTag}' resources in '${envTag}'?"
                     } else {
                         echo "🟢 Auto-confirmed for non-prod environment (${envTag})."
                     }
 
-                    // Step 3: Fetch resource IDs by tag
+                    // Step 3: Collect IDs of resources to delete
                     def resourceIds = sh(
                         script: """
                             az resource list --resource-group "$RESOURCE_GROUP" \
-                              --query "[?tags.environment=='${envTag}' && tags.serviceName=='${svcTag}' && tags.createdBy=='iac-bicep'].id" \
+                              --query "[?tags.environment=='${envTag}' && tags.serviceName=='${svcTag}' && tags.createdBy=='${createdByTag}'].id" \
                               -o tsv
                         """,
                         returnStdout: true
@@ -220,10 +227,8 @@ pipeline {
                         return
                     }
 
-                    // Step 4: Display & delete all matching resources
-                    echo "🔥 Deleting resources created by Bicep for ${svcTag}:"
-                    echo resourceIds
-
+                    // Step 4: Delete resources safely
+                    echo "🔥 Deleting resources tagged with serviceName='${svcTag}'..."
                     sh """
                         echo "${resourceIds}" | xargs -r -I {} az resource delete --ids {} --only-show-errors
                     """

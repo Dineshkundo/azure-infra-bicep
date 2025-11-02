@@ -46,13 +46,6 @@ param tagSuffix string
 param createdBy string
 
 
-// ----------------------------------------
-// ✅ Reference existing Key Vault
-// ----------------------------------------
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: 'CODADEV'
-}
-
 // /////////////////////// Key Vault Module  /////
 
 var vmsToDeployKV = serviceName == 'keyvault' ? vms : []
