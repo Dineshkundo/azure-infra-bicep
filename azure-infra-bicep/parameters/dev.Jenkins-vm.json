@@ -16,7 +16,7 @@
     },
     "vmConfig": {
       "value": {
-        "vmName": "jenkins-dev-vm",
+        "vmName": "iac-dev-vm",
         "location": "eastus",
         "vmSize": "Standard_B2ms",
         "vnetName": "DevVnet",
